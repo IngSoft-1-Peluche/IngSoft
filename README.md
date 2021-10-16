@@ -4,7 +4,26 @@ Backend para la implementacion del juego misterio, desarrollado para la catedra 
 de la Facultad de Matemática, Astronomía, Física y Computación de la Universidad Nacional de Córdoba.  
 Desarrollado en python con ayuda de las librerias de pony.orm y FastAPI.
 
+## Instalar el entorno virtual
+
+* Crear un entorno nuevo con `virtualenv`
+
+       virtualenv env
+
+* Activar el entorno virtual
+
+       source env/bin/activate
+
+* Instalar las dependencias
+
+       pip install -r requirements.txt
+
+
 ## Iniciar servidor
+
+* Para activar el entorno virtual
+
+       source env/bin/activate
 
 * Para iniciar el servidor de manera local utilizar el programa uvicorn con el siguiente comando:
 
