@@ -17,14 +17,16 @@ def test_database():
         j1 = Jugadores(apodo='juan')
         p1 = Partida(nombre='Partida de juan', iniciada=True, creador=j1)
         j1.partida = p1 
+        j2 = Jugadores(apodo='maria')
+        j2.partida = p1
 
+        pony.commit()#Es necesario realizar los commit para que se guarden las entidades en la base y se les asigne un id
         assert p1.nombre == 'Partida de juan'
         assert p1.iniciada == True
         assert p1 in j1.creador_de
         assert j1 in p1.jugadores
-
-        j2 = Jugadores(apodo='maria')
-        j2.partida = p1
-        pony.commit()#Es necesario realizar los commit para que se guarden las entidades en la base y se les asigne un id
+        assert p1.jugador_en_turno == None
+        assert j1.orden_turno == None
         assert j1 in p1.jugadores and j2 in p1.jugadores
         assert j1.id_jugador != j2.id_jugador
+        assert j2.creador_de == []
