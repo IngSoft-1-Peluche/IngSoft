@@ -2,3 +2,4 @@ fastapi==0.70.0
 pony==0.7.14
 pytest==6.2.5
 uvicorn==0.15.0
+requests==2.26.0
