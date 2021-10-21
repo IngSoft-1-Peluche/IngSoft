@@ -25,7 +25,7 @@ def test_database():
     assert p1.iniciada == False
     assert p1 in j1.creador_de
     assert j1 in p1.jugadores
-    assert p1.jugador_en_turno == None
+    assert p1.jugador_en_turno == 1
     assert j1.orden_turno == None
     assert j1 in p1.jugadores and j2 in p1.jugadores
     assert j1.id_jugador != j2.id_jugador
@@ -40,3 +40,17 @@ def test_listar_partidas_endpoint():
     assert response.status_code == status.HTTP_200_OK
     assert all(p['cantidad_jugadores'] < 6 for p in partidas_json)
     assert all(not p.iniciada for p in partidas)
+
+@pony.db_session
+def test_detalle_partida_endpoint():
+    partida = db.Partida.select()[:1][0]
+    response = client.get("/partidas/%s" % partida.id_partida)
+    partida_json = response.json()
+    
+    assert response.status_code == status.HTTP_200_OK
+    assert partida_json['id_partida'] == partida.id_partida
+    assert 'nombre' in partida_json.keys()
+    assert 'id_jugador' in partida_json['jugadores'][0].keys()
+    assert 'apodo' in partida_json['jugadores'][0].keys()
+    assert 'orden' in partida_json['jugadores'][0].keys()
+    assert 'en_turno' in partida_json['jugadores'][0].keys()
