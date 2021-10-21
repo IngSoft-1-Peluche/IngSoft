@@ -40,7 +40,7 @@ async def listar_partidas():
 async def respuesta_creacion(nueva_partida: PartidaIn) -> int:
     nueva_partida_dicionario = nueva_partida.dict()
     jugador = crear_jugador(nueva_partida_dicionario["apodo"])
-    partida = crear_partida(nueva_partida_dicionario["nombre_partida"],jugador)
+    partida = crear_partida(nueva_partida_dicionario["nombre_partida"],jugador.id_jugador)
 
     return PartidaOut(
         id_partida= partida.id_partida,

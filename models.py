@@ -37,7 +37,8 @@ def asociar_a_partida(partida, jugador):
     partida.jugadores.add(jugador)
 
 @pony.db_session()
-def crear_partida(nombre, jugador):
+def crear_partida(nombre, id_jugador):
+    jugador = Jugador[id_jugador]
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
     asociar_a_partida(partida, jugador)
     return partida
