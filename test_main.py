@@ -3,7 +3,7 @@ import pony.orm as pony
 from fastapi import status
 
 from main import app
-from models import db
+from models import Jugador, db
 
 client = TestClient(app)
 
@@ -15,21 +15,22 @@ def test_get_home_page():
 @pony.db_session
 def test_database():
     j1 = db.Jugador(apodo='juan')
+    j2 = db.Jugador(apodo='maria')
+    pony.flush()
     p1 = db.Partida(nombre='Partida de juan', iniciada=False, creador=j1)
     j1.partida = p1 
-    j2 = db.Jugador(apodo='maria')
     j2.partida = p1
-
-    pony.commit()#Es necesario realizar los commit para que se guarden las entidades en la base y se les asigne un id
+    pony.commit()
+    
     assert p1.nombre == 'Partida de juan'
     assert p1.iniciada == False
-    assert p1 in j1.creador_de
+    assert p1 == j1.creador_de
     assert j1 in p1.jugadores
     assert p1.jugador_en_turno == 1
     assert j1.orden_turno == None
     assert j1 in p1.jugadores and j2 in p1.jugadores
     assert j1.id_jugador != j2.id_jugador
-    assert j2.creador_de == []
+    assert j2.creador_de == None
 
 @pony.db_session
 def test_listar_partidas_endpoint():
@@ -40,6 +41,23 @@ def test_listar_partidas_endpoint():
     assert response.status_code == status.HTTP_200_OK
     assert all(p['cantidad_jugadores'] < 6 for p in partidas_json)
     assert all(not p.iniciada for p in partidas)
+
+@pony.db_session
+def test_post_crear_partida():
+    response = client.post("/partidas/")
+    response = client.post(
+        "/partidas/",
+        json={"nombre_partida": "nombre de mi partida", "apodo": "apodo de mi jugador"},
+    )
+    assert type(response.json()["id_jugador"]) == int
+    assert type(response.json()["id_partida"]) == int
+    assert response.json()["jugador_creador"] == True
+    assert response.json()["apodo"] == 'apodo de mi jugador'
+    assert response.json()["nombre_partida"] == 'nombre de mi partida'
+    assert response.status_code == status.HTTP_201_CREATED
+    jugador_creado = pony.select(c for c in Jugador if c.apodo == "apodo de mi jugador" )
+    assert jugador_creado.first() != None
+    assert jugador_creado.first().apodo == "apodo de mi jugador"
 
 @pony.db_session
 def test_detalle_partida_endpoint():
@@ -54,3 +72,4 @@ def test_detalle_partida_endpoint():
     assert 'apodo' in partida_json['jugadores'][0].keys()
     assert 'orden' in partida_json['jugadores'][0].keys()
     assert 'en_turno' in partida_json['jugadores'][0].keys()
+
