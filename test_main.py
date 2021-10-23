@@ -7,22 +7,24 @@ from models import Jugador, db
 
 client = TestClient(app)
 
+
 def test_get_home_page():
     response = client.get("/home")
     assert response.status_code == status.HTTP_200_OK
-    assert response.json() == {"message":"Project home Grupo Peluche"}
+    assert response.json() == {"message": "Project home Grupo Peluche"}
+
 
 @pony.db_session
 def test_database():
-    j1 = db.Jugador(apodo='juan')
-    j2 = db.Jugador(apodo='maria')
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
     pony.flush()
-    p1 = db.Partida(nombre='Partida de juan', iniciada=False, creador=j1)
-    j1.partida = p1 
+    p1 = db.Partida(nombre="Partida de juan", iniciada=False, creador=j1)
+    j1.partida = p1
     j2.partida = p1
     pony.commit()
-    
-    assert p1.nombre == 'Partida de juan'
+
+    assert p1.nombre == "Partida de juan"
     assert p1.iniciada == False
     assert p1 == j1.creador_de
     assert j1 in p1.jugadores
@@ -32,15 +34,17 @@ def test_database():
     assert j1.id_jugador != j2.id_jugador
     assert j2.creador_de == None
 
+
 @pony.db_session
 def test_listar_partidas_endpoint():
     response = client.get("/partidas")
     partidas_json = response.json()
-    partidas = [db.Partida[p['id_partida']] for p in partidas_json]
-    
+    partidas = [db.Partida[p["id_partida"]] for p in partidas_json]
+
     assert response.status_code == status.HTTP_200_OK
-    assert all(p['cantidad_jugadores'] < 6 for p in partidas_json)
+    assert all(p["cantidad_jugadores"] < 6 for p in partidas_json)
     assert all(not p.iniciada for p in partidas)
+
 
 @pony.db_session
 def test_post_crear_partida():
@@ -52,24 +56,24 @@ def test_post_crear_partida():
     assert type(response.json()["id_jugador"]) == int
     assert type(response.json()["id_partida"]) == int
     assert response.json()["jugador_creador"] == True
-    assert response.json()["apodo"] == 'apodo de mi jugador'
-    assert response.json()["nombre_partida"] == 'nombre de mi partida'
+    assert response.json()["apodo"] == "apodo de mi jugador"
+    assert response.json()["nombre_partida"] == "nombre de mi partida"
     assert response.status_code == status.HTTP_201_CREATED
-    jugador_creado = pony.select(c for c in Jugador if c.apodo == "apodo de mi jugador" )
+    jugador_creado = pony.select(c for c in Jugador if c.apodo == "apodo de mi jugador")
     assert jugador_creado.first() != None
     assert jugador_creado.first().apodo == "apodo de mi jugador"
+
 
 @pony.db_session
 def test_detalle_partida_endpoint():
     partida = db.Partida.select()[:1][0]
     response = client.get("/partidas/%s" % partida.id_partida)
     partida_json = response.json()
-    
-    assert response.status_code == status.HTTP_200_OK
-    assert partida_json['id_partida'] == partida.id_partida
-    assert 'nombre' in partida_json.keys()
-    assert 'id_jugador' in partida_json['jugadores'][0].keys()
-    assert 'apodo' in partida_json['jugadores'][0].keys()
-    assert 'orden' in partida_json['jugadores'][0].keys()
-    assert 'en_turno' in partida_json['jugadores'][0].keys()
 
+    assert response.status_code == status.HTTP_200_OK
+    assert partida_json["id_partida"] == partida.id_partida
+    assert "nombre" in partida_json.keys()
+    assert "id_jugador" in partida_json["jugadores"][0].keys()
+    assert "apodo" in partida_json["jugadores"][0].keys()
+    assert "orden" in partida_json["jugadores"][0].keys()
+    assert "en_turno" in partida_json["jugadores"][0].keys()
