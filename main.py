@@ -3,7 +3,7 @@ import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import db, crear_jugador, crear_partida
+from models import db, crear_jugador, crear_partida, asociar_a_partida
 
 app = FastAPI()
 
@@ -86,3 +86,22 @@ async def detalle_partida(id_partida: int):
             "nombre": partida.nombre,
             "jugadores": jugadores_json,
         }
+
+
+@app.put("/partidas/{id_partida}")
+async def unirse_a_partida(id_partida: int, apodo: str):
+    with pony.db_session:
+        partida = db.Partida[id_partida]
+        if (len(partida.jugadores) < 6):
+            jugador = crear_jugador(apodo)
+            asociar_a_partida(partida, jugador)
+        else:
+            return 0
+
+    return PartidaOut(
+        id_partida=partida.id_partida,
+        nombre_partida=partida.nombre,
+        id_jugador=jugador.id_jugador,
+        apodo=jugador.apodo,
+        jugador_creador=False,
+    )
