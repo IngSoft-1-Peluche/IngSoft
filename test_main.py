@@ -3,7 +3,7 @@ import pony.orm as pony
 from fastapi import status
 
 from main import app
-from models import Jugador, db
+from models import Jugador, asignar_orden_aleatorio, db
 
 client = TestClient(app)
 
@@ -77,3 +77,23 @@ def test_detalle_partida_endpoint():
     assert "apodo" in partida_json["jugadores"][0].keys()
     assert "orden" in partida_json["jugadores"][0].keys()
     assert "en_turno" in partida_json["jugadores"][0].keys()
+
+
+@pony.db_session
+def test_asignar_orden():
+    from models import asignar_orden_aleatorio
+
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    j3 = db.Jugador(apodo="pedro")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida de juan", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    j3.partida = p1
+    asignar_orden_aleatorio(p1)
+    pony.commit()
+
+    n = len(p1.jugadores)
+    ordenes = [j.orden_turno for j in p1.jugadores]
+    assert set(range(1, n + 1)) == set(ordenes)
