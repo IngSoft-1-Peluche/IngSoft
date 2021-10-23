@@ -41,6 +41,7 @@ async def listar_partidas():
             'cantidad_jugadores': len(p.jugadores)
                 } for p in partidas]
 
+
 @app.post("/partidas/", 
     response_model=PartidaOut,
     status_code=status.HTTP_201_CREATED
@@ -56,3 +57,20 @@ async def respuesta_creacion(nueva_partida: PartidaIn) -> int:
         id_jugador = jugador.id_jugador,
         apodo = jugador.apodo,
         jugador_creador = True)
+
+@app.get("/partidas/{id_partida}")
+async def detalle_partida(id_partida: int):
+    with pony.db_session:
+        partida = db.Partida[id_partida]
+        jugadores_json = [{
+            'id_jugador': j.id_jugador,
+            'apodo': j.apodo,
+            'orden': j.orden_turno,
+            'en_turno': j.orden_turno == partida.jugador_en_turno
+        } for j in partida.jugadores.order_by(db.Jugador.orden_turno)]
+        return {
+            'id_partida': partida.id_partida,
+            'nombre': partida.nombre,
+            'jugadores': jugadores_json
+                }
+

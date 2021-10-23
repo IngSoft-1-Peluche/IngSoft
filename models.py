@@ -9,7 +9,7 @@ class Partida(db.Entity):
     iniciada = pony.Required(bool, default=False)
     creador = pony.Required("Jugador", reverse='creador_de')
     jugadores = pony.Set("Jugador", reverse='partida')
-    jugador_en_turno = pony.Optional(int)
+    jugador_en_turno = pony.Optional(int, default=1)
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
