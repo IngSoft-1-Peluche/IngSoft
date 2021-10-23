@@ -1,10 +1,18 @@
 from fastapi import FastAPI, status
 import pony.orm as pony
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 from models import db , crear_jugador, crear_partida
 
 app = FastAPI()
+
+#Permisos para fetch de Front
+app.add_middleware(CORSMiddleware,
+allow_origins=["*"],
+allow_credentials=True,
+allow_methods=["*"],
+allow_headers=["*"],)
 
 class PartidaIn(BaseModel):
     nombre_partida: str
