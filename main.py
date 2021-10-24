@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -86,3 +86,20 @@ async def detalle_partida(id_partida: int):
             "nombre": partida.nombre,
             "jugadores": jugadores_json,
         }
+
+
+@app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
+async def iniciar_partida(id_jugador: int, id_partida: int):
+    with pony.db_session:
+        partida = db.Partida[id_partida]
+        if 1 < len(partida.jugadores) < 7 and id_jugador == partida.creador.id_jugador:
+            return status.HTTP_201_CREATED
+        elif id_jugador != partida.creador.id_jugador:
+            raise HTTPException(
+                status_code=500, detail="No eres el dueño de la partida"
+            )
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="La partida no cumple con los jugadores necesarios para iniciarse",
+            )
