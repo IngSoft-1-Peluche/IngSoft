@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, HTTPException
 import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -92,11 +92,13 @@ async def detalle_partida(id_partida: int):
 async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
-        if (len(partida.jugadores) < 6):
+        if len(partida.jugadores) < 6:
             jugador = crear_jugador(apodo)
             asociar_a_partida(partida, jugador)
         else:
-            return 0
+            raise HTTPException(
+                status_code=500, detail="No puedes unirte a esta partida"
+            )
 
     return PartidaOut(
         id_partida=partida.id_partida,
