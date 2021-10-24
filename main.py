@@ -92,8 +92,15 @@ async def detalle_partida(id_partida: int):
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
-        if 1 < len(partida.jugadores) < 7 and id_jugador == partida.creador.id_jugador:
+        if (
+            partida.iniciada == False
+            and 1 < len(partida.jugadores) < 7
+            and id_jugador == partida.creador.id_jugador
+        ):
+            partida.iniciada = True
             return status.HTTP_201_CREATED
+        elif partida.iniciada == True:
+            raise HTTPException(status_code=500, detail="La partida ya se esta jugando")
         elif id_jugador != partida.creador.id_jugador:
             raise HTTPException(
                 status_code=500, detail="No eres el dueño de la partida"
