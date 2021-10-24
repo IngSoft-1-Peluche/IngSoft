@@ -89,7 +89,7 @@ async def detalle_partida(id_partida: int):
 
 
 @app.put("/partidas/{id_partida}")
-async def unirse_a_partida(id_partida: int, apodo: str):
+async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
         if (len(partida.jugadores) < 6):
