@@ -3,7 +3,7 @@ import pony.orm as pony
 from fastapi import status
 
 from main import app
-from models import Jugador, asignar_orden_aleatorio, db
+from models import Jugador, db
 
 client = TestClient(app)
 
