@@ -79,6 +79,7 @@ def test_detalle_partida_endpoint():
     assert "en_turno" in partida_json["jugadores"][0].keys()
 
 
+
 @pony.db_session
 def test_asignar_orden():
     from models import asignar_orden_aleatorio
@@ -97,3 +98,18 @@ def test_asignar_orden():
     n = len(p1.jugadores)
     ordenes = [j.orden_turno for j in p1.jugadores]
     assert set(range(1, n + 1)) == set(ordenes)
+
+@pony.db_session
+def test_inciar_partida_correcta():
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida a iniciar", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    pony.commit()
+
+    response = client.patch("/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador})
+
+    assert response.status_code == status.HTTP_201_CREATED
+
