@@ -3,7 +3,7 @@ import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import db, crear_jugador, crear_partida
+from models import db, crear_jugador, crear_partida, asignar_orden_aleatorio
 
 app = FastAPI()
 
@@ -98,6 +98,7 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
             and id_jugador == partida.creador.id_jugador
         ):
             partida.iniciada = True
+            asignar_orden_aleatorio(partida)
             return status.HTTP_201_CREATED
         elif partida.iniciada == True:
             raise HTTPException(status_code=500, detail="La partida ya se esta jugando")
