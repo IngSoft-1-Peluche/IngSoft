@@ -1,9 +1,10 @@
+from models import asociar_a_partida, crear_jugador, crear_partida
 from fastapi.testclient import TestClient
 import pony.orm as pony
 from fastapi import status
 
 from main import app
-from models import Jugador, db
+from models import Jugador, Partida, db
 
 client = TestClient(app)
 
@@ -77,3 +78,32 @@ def test_detalle_partida_endpoint():
     assert "apodo" in partida_json["jugadores"][0].keys()
     assert "orden" in partida_json["jugadores"][0].keys()
     assert "en_turno" in partida_json["jugadores"][0].keys()
+
+@pony.db_session
+def test_unirse_a_partida():
+    response = client.put("/partidas/1", params={"apodo": "ultimo"})
+    assert response.json()["id_partida"] == 1
+    assert response.json()["nombre_partida"] == db.Partida[1].nombre
+    assert response.json()["apodo"] == "ultimo"
+    assert response.json()["jugador_creador"] == False
+
+@pony.db_session
+def test_unirse_a_partida_llena():
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    j3 = db.Jugador(apodo="j3")
+    j4 = db.Jugador(apodo="m4")
+    j5 = db.Jugador(apodo="j5")
+    j6 = db.Jugador(apodo="m6")
+    pony.flush()
+    p1 = db.Partida(nombre="partida llena", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    j3.partida = p1
+    j4.partida = p1
+    j5.partida = p1
+    j6.partida = p1
+    pony.commit()
+    response = client.put("/partidas/%s" % p1.id_partida, params={"apodo": "no_entra"})
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
