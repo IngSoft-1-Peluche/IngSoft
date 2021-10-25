@@ -79,7 +79,6 @@ def test_detalle_partida_endpoint():
     assert "en_turno" in partida_json["jugadores"][0].keys()
 
 
-
 @pony.db_session
 def test_unirse_a_partida():
     response = client.put("/partidas/1", params={"apodo": "ultimo"})
@@ -134,13 +133,53 @@ def test_asignar_orden():
 def test_inciar_partida_correcta():
     j1 = db.Jugador(apodo="juan")
     j2 = db.Jugador(apodo="maria")
+    j3 = db.Jugador(apodo="j3")
+    j4 = db.Jugador(apodo="m4")
+    j5 = db.Jugador(apodo="j5")
+    j6 = db.Jugador(apodo="m6")
     pony.flush()
     p1 = db.Partida(nombre="Partida a iniciar", iniciada=False, creador=j1)
     j1.partida = p1
     j2.partida = p1
+    j3.partida = p1
+    j4.partida = p1
+    j5.partida = p1
+    j6.partida = p1
     pony.commit()
 
-    response = client.patch("/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador})
+    response = client.patch(
+        "/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador}
+    )
 
     assert response.status_code == status.HTTP_201_CREATED
 
+
+@pony.db_session
+def test_inciar_partida_uno_solo():
+    j1 = db.Jugador(apodo="juan")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida de uno solo", iniciada=False, creador=j1)
+    j1.partida = p1
+    pony.commit()
+
+    response = client.patch(
+        "/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador}
+    )
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+@pony.db_session
+def test_inciar_partida_no_creador():
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida que no puede iniciarse", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    pony.commit()
+
+    response = client.patch(
+        "/partidas/%s" % p1.id_partida, params={"id_jugador": j2.id_jugador}
+    )
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
