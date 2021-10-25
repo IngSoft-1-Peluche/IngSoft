@@ -1,4 +1,3 @@
-from models import asociar_a_partida, crear_jugador, crear_partida
 from fastapi.testclient import TestClient
 import pony.orm as pony
 from fastapi import status
