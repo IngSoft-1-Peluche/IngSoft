@@ -3,7 +3,7 @@ import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import db, crear_jugador, crear_partida, asignar_orden_aleatorio
+from models import db, crear_jugador, crear_partida, asociar_a_partida, asignar_orden_aleatorio
 
 app = FastAPI()
 
@@ -88,6 +88,28 @@ async def detalle_partida(id_partida: int):
         }
 
 
+
+@app.put("/partidas/{id_partida}", response_model=PartidaOut)
+async def unirse_a_partida(apodo: str, id_partida: int):
+    with pony.db_session:
+        partida = db.Partida[id_partida]
+        if len(partida.jugadores) < 6:
+            jugador = crear_jugador(apodo)
+            asociar_a_partida(partida, jugador)
+        else:
+            raise HTTPException(
+                status_code=500, detail="No puedes unirte a esta partida"
+            )
+
+    return PartidaOut(
+        id_partida=partida.id_partida,
+        nombre_partida=partida.nombre,
+        id_jugador=jugador.id_jugador,
+        apodo=jugador.apodo,
+        jugador_creador=False,
+    )
+
+  
 @app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
