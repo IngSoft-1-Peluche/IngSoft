@@ -5,6 +5,8 @@ from fastapi import status
 from main import app
 from models import db
 
+from .test_board import test_posiciones_posibles_a_mover
+
 client = TestClient(app)
 
 
