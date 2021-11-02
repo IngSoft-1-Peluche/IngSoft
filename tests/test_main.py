@@ -3,7 +3,7 @@ import pony.orm as pony
 from fastapi import status
 
 from main import app
-from models import Jugador, Partida, db
+from models import db
 
 client = TestClient(app)
 
@@ -59,7 +59,7 @@ def test_post_crear_partida():
     assert response.json()["apodo"] == "apodo de mi jugador"
     assert response.json()["nombre_partida"] == "nombre de mi partida"
     assert response.status_code == status.HTTP_201_CREATED
-    jugador_creado = pony.select(c for c in Jugador if c.apodo == "apodo de mi jugador")
+    jugador_creado = pony.select(c for c in db.Jugador if c.apodo == "apodo de mi jugador")
     assert jugador_creado.first() != None
     assert jugador_creado.first().apodo == "apodo de mi jugador"
 
@@ -111,7 +111,7 @@ def test_unirse_a_partida_llena():
 
 @pony.db_session
 def test_asignar_orden():
-    from models import asignar_orden_aleatorio
+    from services.start_game import asignar_orden_aleatorio
 
     j1 = db.Jugador(apodo="juan")
     j2 = db.Jugador(apodo="maria")

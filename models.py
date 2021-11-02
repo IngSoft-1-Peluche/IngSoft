@@ -20,6 +20,10 @@ class Jugador(db.Entity):
     creador_de = pony.Optional("Partida", reverse="creador")
     partida = pony.Optional("Partida", reverse="jugadores")
 
+    @pony.db_session()
+    def asociar_a_partida(self, partida):
+        partida.jugadores.add(self)
+
 
 # línea que sirve para debug
 pony.set_sql_debug(True)
@@ -34,26 +38,9 @@ def crear_jugador(apodo):
     jugador = Jugador(apodo=apodo)
     return jugador
 
-
-@pony.db_session()
-def asociar_a_partida(partida, jugador):
-    partida.jugadores.add(jugador)
-
-
 @pony.db_session()
 def crear_partida(nombre, id_jugador):
     jugador = Jugador[id_jugador]
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
-    asociar_a_partida(partida, jugador)
+    jugador.asociar_a_partida(partida)
     return partida
-
-
-@pony.db_session()
-def asignar_orden_aleatorio(partida):
-    jugadores = partida.jugadores
-    random.shuffle(list(jugadores))
-    i = 1
-    for jugador in jugadores:
-        jugador.orden_turno = i
-        i += 1
-    return jugadores
