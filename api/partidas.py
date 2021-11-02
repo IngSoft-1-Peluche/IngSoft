@@ -2,9 +2,9 @@ import pony.orm as pony
 from fastapi import status, APIRouter
 from pydantic import BaseModel
 
-#from ..models.base import db
-from ..models.partida import crear_partida
-from ..models.jugador import crear_jugador
+from models import db
+from models.partida import crear_partida
+from models.jugador import crear_jugador
 
 router = APIRouter()
 

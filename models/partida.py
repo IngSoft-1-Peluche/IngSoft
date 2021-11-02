@@ -11,14 +11,6 @@ class Partida(db.Entity):
     jugadores = pony.Set("Jugador", reverse="partida")
     jugador_en_turno = pony.Optional(int, default=1)
 
-
-# línea que sirve para debug
-pony.set_sql_debug(True)
-
-# creación de tablas para los modelos
-db.bind("sqlite", "database.sqlite", create_db=True)
-db.generate_mapping(create_tables=True)
-
 @pony.db_session()
 def crear_partida(nombre, jugador):
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)

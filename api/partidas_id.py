@@ -1,13 +1,13 @@
 from fastapi import status, HTTPException
 import pony.orm as pony
 
-from ..models import db
-from ..models.jugador import asociar_a_partida, crear_jugador
+from models import db
+from models.jugador import asociar_a_partida, crear_jugador
 
-from ..services.start_game import asignar_orden_aleatorio
+from services.start_game import asignar_orden_aleatorio
 from .partidas import router, PartidaOut
 
-@router.get("/{id_partida}")
+@router.get("/{id_partida}/")
 async def detalle_partida(id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
@@ -28,7 +28,7 @@ async def detalle_partida(id_partida: int):
 
 
 
-@router.put("/{id_partida}", response_model=PartidaOut)
+@router.put("/{id_partida}/", response_model=PartidaOut)
 async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
@@ -49,7 +49,7 @@ async def unirse_a_partida(apodo: str, id_partida: int):
     )
 
   
-@router.patch("/{id_partida}", status_code=status.HTTP_201_CREATED)
+@router.patch("/{id_partida}/", status_code=status.HTTP_201_CREATED)
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
         partida = db.Partida[id_partida]
