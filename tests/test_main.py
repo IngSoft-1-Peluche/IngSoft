@@ -2,8 +2,13 @@ from fastapi.testclient import TestClient
 import pony.orm as pony
 from fastapi import status
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 from main import app
-from models import Jugador, Partida, db
+from models import db
 
 client = TestClient(app)
 
