@@ -152,7 +152,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
     with pony.db_session:
         jugador = db.Jugador[id_jugador]
         partida = db.Jugador[id_jugador].partida
-        await manager.connect(websocket)
+        await manager.connect(partida.id_partida, websocket)
         try:
             while True:
                 entrada = await websocket.receive_json()
@@ -166,11 +166,18 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         await manager.broadcast(
                             action2,
                             f"El jugador #{id_jugador} de la partida {partida.id_partida} de orden {jugador.orden_turno} acaba de tirar el dado y obtuvo un {data} y es turno de orden {partida.jugador_en_turno}",
+                            partida.id_partida,
                         )
                     else:
-                        action1= "no_turno"
-                        await manager.send_personal_message(action1, f"No te toca", websocket)
+                        action1 = "no_turno"
+                        await manager.send_personal_message(
+                            action1, f"No te toca", websocket
+                        )
 
         except WebSocketDisconnect:
             manager.disconnect(websocket)
-            await manager.broadcast(f"El jugador #{id_jugador} se fue de la partida")
+            await manager.broadcast(
+                f"Desconectado",
+                f"El jugador #{id_jugador} se fue de la partida",
+                partida.id_partida,
+            )
