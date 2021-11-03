@@ -1,10 +1,17 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, WebSocket, WebSocketDisconnect
 import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import db, crear_jugador, crear_partida
-from services.start_game import asignar_orden_aleatorio
+from sockets import ConnectionManager
+from services.start_game import (
+    asignar_orden_aleatorio,
+    tirar_dado,
+    pasar_turno,
+    jugador_esta_en_turno,
+)
+
 
 app = FastAPI()
 
@@ -89,7 +96,6 @@ async def detalle_partida(id_partida: int):
         }
 
 
-
 @app.put("/partidas/{id_partida}", response_model=PartidaOut)
 async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
@@ -110,7 +116,7 @@ async def unirse_a_partida(apodo: str, id_partida: int):
         jugador_creador=False,
     )
 
-  
+
 @app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
@@ -134,3 +140,37 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
                 status_code=500,
                 detail="La partida no cumple con los jugadores necesarios para iniciarse",
             )
+
+
+# Toda la parte de WEBSockets
+
+manager = ConnectionManager()
+
+
+@app.websocket("/ws/{id_jugador}")
+async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
+    with pony.db_session:
+        jugador = db.Jugador[id_jugador]
+        partida = db.Jugador[id_jugador].partida
+        await manager.connect(websocket)
+        try:
+            while True:
+                entrada = await websocket.receive_json()
+                if entrada["action"] == "tirar_dado":
+                    if jugador_esta_en_turno(jugador, partida):
+                        action1 = "tire_dado"
+                        action2 = "tiraron_dado"
+                        data = tirar_dado()
+                        pasar_turno(partida)
+                        await manager.send_personal_message(action1, data, websocket)
+                        await manager.broadcast(
+                            action2,
+                            f"El jugador #{id_jugador} de la partida {partida.id_partida} de orden {jugador.orden_turno} acaba de tirar el dado y obtuvo un {data} y es turno de orden {partida.jugador_en_turno}",
+                        )
+                    else:
+                        action1= "no_turno"
+                        await manager.send_personal_message(action1, f"No te toca", websocket)
+
+        except WebSocketDisconnect:
+            manager.disconnect(websocket)
+            await manager.broadcast(f"El jugador #{id_jugador} se fue de la partida")
