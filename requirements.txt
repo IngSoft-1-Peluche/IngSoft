@@ -4,4 +4,5 @@ pytest==6.2.5
 uvicorn==0.15.0
 requests==2.26.0
 black==21.9b0
+websockets==10.0
 numpy==1.21.3
