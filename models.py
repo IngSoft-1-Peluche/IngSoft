@@ -14,6 +14,10 @@ class Partida(db.Entity):
     cartas = pony.Set("Carta", reverse="partida")
     sobre = pony.Set("Carta", reverse="sobre")
 
+    @pony.db_session()
+    def cantidad_jugadores(self):
+        return len(self.jugadores)
+
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
@@ -26,6 +30,7 @@ class Jugador(db.Entity):
     @pony.db_session()
     def asociar_a_partida(self, partida):
         partida.jugadores.add(self)
+
 
 class Carta(db.Entity):
     id_carta = pony.PrimaryKey(int, auto=True)
@@ -48,6 +53,7 @@ db.generate_mapping(create_tables=True)
 def crear_jugador(apodo):
     jugador = Jugador(apodo=apodo)
     return jugador
+
 
 @pony.db_session()
 def crear_partida(nombre, id_jugador):
