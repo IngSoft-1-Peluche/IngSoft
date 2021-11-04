@@ -5,7 +5,8 @@ from fastapi import status
 from main import app
 from models import db
 
-from .test_board import test_posiciones_posibles_a_mover
+from .test_board import *
+from .test_cards import *
 
 client = TestClient(app)
 
@@ -61,7 +62,9 @@ def test_post_crear_partida():
     assert response.json()["apodo"] == "apodo de mi jugador"
     assert response.json()["nombre_partida"] == "nombre de mi partida"
     assert response.status_code == status.HTTP_201_CREATED
-    jugador_creado = pony.select(c for c in db.Jugador if c.apodo == "apodo de mi jugador")
+    jugador_creado = pony.select(
+        c for c in db.Jugador if c.apodo == "apodo de mi jugador"
+    )
     assert jugador_creado.first() != None
     assert jugador_creado.first().apodo == "apodo de mi jugador"
 
@@ -88,6 +91,7 @@ def test_unirse_a_partida():
     assert response.json()["nombre_partida"] == db.Partida[1].nombre
     assert response.json()["apodo"] == "ultimo"
     assert response.json()["jugador_creador"] == False
+
 
 @pony.db_session
 def test_unirse_a_partida_llena():
@@ -169,6 +173,7 @@ def test_inciar_partida_uno_solo():
     )
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
 
 @pony.db_session
 def test_inciar_partida_no_creador():
