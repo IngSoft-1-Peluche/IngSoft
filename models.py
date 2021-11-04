@@ -19,10 +19,16 @@ class Jugador(db.Entity):
     orden_turno = pony.Optional(int)
     creador_de = pony.Optional("Partida", reverse="creador")
     partida = pony.Optional("Partida", reverse="jugadores")
+    posicion = pony.Optional(int)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
         partida.jugadores.add(self)
+    
+    @pony.db_session()
+    def cambiar_posicion(self, nueva_pos):
+        self.posicion = nueva_pos
+
 
 
 # línea que sirve para debug
@@ -44,3 +50,5 @@ def crear_partida(nombre, id_jugador):
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
     jugador.asociar_a_partida(partida)
     return partida
+
+
