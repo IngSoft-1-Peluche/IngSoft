@@ -14,15 +14,18 @@ class ConnectionManager:
             if connection[2] == websocket:
                 self.active_connections.remove(connection)
 
-    async def send_message_to(self, id_jugador, action, data):
-        for connection in self.active_connections:
-            if connection[0] == id_jugador:
-                await connection[2].send_json({"action": action, "data": data})
+    async def send_message_to(self, action, data, id_jugador):
+        if data != "":
+            for connection in self.active_connections:
+                if connection[0] == id_jugador:
+                    await connection[2].send_json({"action": action, "data": data})
 
     async def send_personal_message(self, action, data, websocket: WebSocket):
-        await websocket.send_json({"action":action, "data":data})
+        if data != "":
+            await websocket.send_json({"action":action, "data":data})
 
     async def broadcast(self, action, data, id_partida):
-        for connection in self.active_connections:
-            if connection[1] == id_partida:
-                await connection[2].send_json({"action": action, "data": data})
+        if data != "":
+            for connection in self.active_connections:
+                if connection[1] == id_partida:
+                    await connection[2].send_json({"action": action, "data": data})

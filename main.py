@@ -160,7 +160,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta = pasar_turno(partida)
                 await manager.send_personal_message(respuesta['personal_message']['action'], respuesta['personal_message']['data'], websocket)
                 await manager.broadcast(respuesta['to_broadcast']['action'], respuesta['to_broadcast']['data'], partida.id_partida)
-                await manager.send_message_to(respuesta['message_to']['action'], respuesta['message_to']['data'], respuesta['id_jugador']['data'])
+                await manager.send_message_to(respuesta['message_to']['action'], respuesta['message_to']['data'], respuesta['message_to']['id_jugador'])
         except WebSocketDisconnect:
             manager.disconnect(websocket)
             await manager.broadcast(

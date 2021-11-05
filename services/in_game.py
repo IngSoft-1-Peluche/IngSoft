@@ -53,7 +53,7 @@ def tirar_dado(jugador, partida):
         data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
-        message_to = {"action": action3, "data": data3}
+        message_to = {"action": action3, "data": data3, "id_jugador": 0}
     else:
         action1 = "error_imp"
         data1 = {"message": "No es tu turno"}
@@ -63,6 +63,6 @@ def tirar_dado(jugador, partida):
         to_broadcast = {"action": action2, "data": data2}
         action3 = ""
         data3 = ""
-        message_to = {"action": action3, "data": data3}
+        message_to = {"action": action3, "data": data3, "id_jugador": 0}
     return {"personal_message": personal_message, "to_broadcast":to_broadcast, "message_to": message_to}
         
