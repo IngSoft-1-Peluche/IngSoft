@@ -168,7 +168,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     )
                 if entrada["action"] == "terminar_turno":
                     respuesta = pasar_turno(partida)
-                if entrada["action"] == "mostrar":
+                if entrada["action"] == "mostrar_cartas":
                     respuesta = mostrar_cartas(jugador)
                 await manager.send_personal_message(
                     respuesta["personal_message"]["action"],
