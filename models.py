@@ -20,6 +20,7 @@ class Jugador(db.Entity):
     creador_de = pony.Optional("Partida", reverse="creador")
     partida = pony.Optional("Partida", reverse="jugadores")
     posicion = pony.Optional(int)
+    ultima_tirada = pony.Optional(int)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):

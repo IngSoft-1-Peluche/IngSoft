@@ -1,4 +1,5 @@
 
+
 from fastapi import FastAPI, status, HTTPException, WebSocket, WebSocketDisconnect
 import pony.orm as pony
 from pydantic import BaseModel
@@ -9,7 +10,7 @@ from my_sockets import ConnectionManager
 from services.start_game import (
     asignar_orden_aleatorio,
 )
-from services.in_game import tirar_dado, pasar_turno
+from services.in_game import tirar_dado, pasar_turno, mover_jugador
 
 app = FastAPI()
 
@@ -156,6 +157,8 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 entrada = await websocket.receive_json()
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
+                if entrada["action"] == "mover_jugador":
+                    respuesta = mover_jugador(jugador, entrada["data"]["nueva_posicion"])
                 if entrada["action"] == "terminar_turno":
                     respuesta = pasar_turno(partida)
                 await manager.send_personal_message(respuesta['personal_message']['action'], respuesta['personal_message']['data'], websocket)
