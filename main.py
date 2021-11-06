@@ -4,14 +4,13 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 from models import db, crear_jugador, crear_partida
-from sockets import ConnectionManager
+from my_sockets import ConnectionManager
 from services.start_game import (
     iniciar_partida_service,
     tirar_dado,
     pasar_turno,
-    jugador_esta_en_turno,
 )
-
+from services.in_game import tirar_dado, pasar_turno, mover_jugador
 
 app = FastAPI()
 
@@ -151,28 +150,33 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
     with pony.db_session:
         jugador = db.Jugador[id_jugador]
         partida = db.Jugador[id_jugador].partida
-        await manager.connect(partida.id_partida, websocket)
+        await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
         try:
             while True:
                 entrada = await websocket.receive_json()
                 if entrada["action"] == "tirar_dado":
-                    if jugador_esta_en_turno(jugador, partida):
-                        action1 = "tire_dado"
-                        action2 = "tiraron_dado"
-                        data = tirar_dado()
-                        pasar_turno(partida)
-                        await manager.send_personal_message(action1, data, websocket)
-                        await manager.broadcast(
-                            action2,
-                            f"El jugador #{id_jugador} de la partida {partida.id_partida} de orden {jugador.orden_turno} acaba de tirar el dado y obtuvo un {data} y es turno de orden {partida.jugador_en_turno}",
-                            partida.id_partida,
-                        )
-                    else:
-                        action1 = "no_turno"
-                        await manager.send_personal_message(
-                            action1, f"No te toca", websocket
-                        )
-
+                    respuesta = tirar_dado(jugador, partida)
+                if entrada["action"] == "mover_jugador":
+                    respuesta = mover_jugador(
+                        jugador, entrada["data"]["nueva_posicion"]
+                    )
+                if entrada["action"] == "terminar_turno":
+                    respuesta = pasar_turno(partida)
+                await manager.send_personal_message(
+                    respuesta["personal_message"]["action"],
+                    respuesta["personal_message"]["data"],
+                    websocket,
+                )
+                await manager.broadcast(
+                    respuesta["to_broadcast"]["action"],
+                    respuesta["to_broadcast"]["data"],
+                    partida.id_partida,
+                )
+                await manager.send_message_to(
+                    respuesta["message_to"]["action"],
+                    respuesta["message_to"]["data"],
+                    respuesta["message_to"]["id_jugador"],
+                )
         except WebSocketDisconnect:
             manager.disconnect(websocket)
             await manager.broadcast(
