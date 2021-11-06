@@ -73,3 +73,14 @@ def distribuir_cartas(partida):
     for jugador in partida.jugadores.order_by(db.Jugador.orden_turno):
         for carta in grupos_cartas[jugador.orden_turno - 1]:
             jugador.cartas.add(carta)
+
+
+@pony.db_session()
+def listar_cartas(jugador):
+    respuesta = {}
+    respuesta['message'] = "mostrar_cartas"
+    data = {'cartas': []}
+    for carta in jugador.cartas:
+        data['cartas'].append(carta.nombre)
+    respuesta['data'] = data
+    return respuesta
