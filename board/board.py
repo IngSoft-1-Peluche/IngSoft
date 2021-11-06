@@ -21,6 +21,17 @@ for i in range(1, 85):
 for i in [1, 3, 5, 36, 39, 70, 72, 74]:
     CASILLAS[i] = "R"
 
+RECINTOS = {
+    1: "Cochera",
+    3: "Alcoba",
+    5: "Biblioteca",
+    36: "Vestibulo",
+    39: "Panteon",
+    70: "Bodega",
+    72: "Salon",
+    74: "Laboratorio"
+}
+
 CARTAS = [
     ("Alcoba", "R"),
     ("Biblioteca", "R"),
