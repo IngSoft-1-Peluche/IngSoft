@@ -1,8 +1,7 @@
 import pony.orm as pony
+from models import db
 import random
 import numpy as np
-
-from models import db
 
 from board.board import CARTAS
 

@@ -25,11 +25,17 @@ class Jugador(db.Entity):
     orden_turno = pony.Optional(int)
     creador_de = pony.Optional("Partida", reverse="creador")
     partida = pony.Optional("Partida", reverse="jugadores")
+    posicion = pony.Optional(int)
+    ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
         partida.jugadores.add(self)
+
+    @pony.db_session()
+    def cambiar_posicion(self, nueva_pos):
+        self.posicion = nueva_pos
 
 
 class Carta(db.Entity):
