@@ -32,11 +32,10 @@ class Jugador(db.Entity):
     @pony.db_session()
     def asociar_a_partida(self, partida):
         partida.jugadores.add(self)
-    
+
     @pony.db_session()
     def cambiar_posicion(self, nueva_pos):
         self.posicion = nueva_pos
-
 
 
 class Carta(db.Entity):
@@ -68,5 +67,3 @@ def crear_partida(nombre, id_jugador):
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
     jugador.asociar_a_partida(partida)
     return partida
-
-

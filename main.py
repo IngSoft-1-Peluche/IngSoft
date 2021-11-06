@@ -1,5 +1,3 @@
-
-
 from fastapi import FastAPI, status, HTTPException, WebSocket, WebSocketDisconnect
 import pony.orm as pony
 from pydantic import BaseModel
@@ -8,11 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import db, crear_jugador, crear_partida
 from my_sockets import ConnectionManager
 from services.start_game import (
-    asignar_orden_aleatorio,
     iniciar_partida_service,
     tirar_dado,
     pasar_turno,
-    jugador_esta_en_turno,
 )
 from services.in_game import tirar_dado, pasar_turno, mover_jugador
 
@@ -161,12 +157,26 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
                 if entrada["action"] == "mover_jugador":
-                    respuesta = mover_jugador(jugador, entrada["data"]["nueva_posicion"])
+                    respuesta = mover_jugador(
+                        jugador, entrada["data"]["nueva_posicion"]
+                    )
                 if entrada["action"] == "terminar_turno":
                     respuesta = pasar_turno(partida)
-                await manager.send_personal_message(respuesta['personal_message']['action'], respuesta['personal_message']['data'], websocket)
-                await manager.broadcast(respuesta['to_broadcast']['action'], respuesta['to_broadcast']['data'], partida.id_partida)
-                await manager.send_message_to(respuesta['message_to']['action'], respuesta['message_to']['data'], respuesta['message_to']['id_jugador'])
+                await manager.send_personal_message(
+                    respuesta["personal_message"]["action"],
+                    respuesta["personal_message"]["data"],
+                    websocket,
+                )
+                await manager.broadcast(
+                    respuesta["to_broadcast"]["action"],
+                    respuesta["to_broadcast"]["data"],
+                    partida.id_partida,
+                )
+                await manager.send_message_to(
+                    respuesta["message_to"]["action"],
+                    respuesta["message_to"]["data"],
+                    respuesta["message_to"]["id_jugador"],
+                )
         except WebSocketDisconnect:
             manager.disconnect(websocket)
             await manager.broadcast(

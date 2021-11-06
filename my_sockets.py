@@ -1,6 +1,7 @@
 from fastapi import WebSocket
 from typing import List
 
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[(int, int, WebSocket)] = []
@@ -22,7 +23,7 @@ class ConnectionManager:
 
     async def send_personal_message(self, action, data, websocket: WebSocket):
         if data != "":
-            await websocket.send_json({"action":action, "data":data})
+            await websocket.send_json({"action": action, "data": data})
 
     async def broadcast(self, action, data, id_partida):
         if data != "":

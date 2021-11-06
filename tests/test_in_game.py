@@ -1,7 +1,15 @@
 import pony.orm as pony
-from services.in_game import numero_dado,siguiente_jugador, pasar_turno, jugador_esta_en_turno, tirar_dado, mover_jugador
+from services.in_game import (
+    numero_dado,
+    siguiente_jugador,
+    pasar_turno,
+    jugador_esta_en_turno,
+    tirar_dado,
+    mover_jugador,
+)
 from services.board_functions import posiciones_posibles_a_mover
 from models import Partida, Jugador, db
+
 
 @pony.db_session
 def test_siguiente_jugador_de_a_2():
@@ -17,6 +25,7 @@ def test_siguiente_jugador_de_a_2():
     pony.commit()
     jugador_siguiente = siguiente_jugador(mi_partida_de_2)
     assert jugador_siguiente == j1
+
 
 @pony.db_session
 def test_siguiente_jugador_de_a_6():
@@ -45,6 +54,7 @@ def test_siguiente_jugador_de_a_6():
     jugador_siguiente = siguiente_jugador(mi_partida_de_6)
     assert jugador_siguiente == j1
 
+
 @pony.db_session
 def test_pasar_turno():
     j1 = db.Jugador(apodo="j1")
@@ -67,6 +77,7 @@ def test_pasar_turno():
     assert respuesta["message_to"]["data"] == {}
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
 
+
 @pony.db_session
 def test_jugador_esta_en_turno():
     j1 = db.Jugador(apodo="j1")
@@ -79,8 +90,9 @@ def test_jugador_esta_en_turno():
     j2.orden_turno = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
-    assert jugador_esta_en_turno(j1,mi_partida_de_2) == False
-    assert jugador_esta_en_turno(j2,mi_partida_de_2) == True
+    assert jugador_esta_en_turno(j1, mi_partida_de_2) == False
+    assert jugador_esta_en_turno(j2, mi_partida_de_2) == True
+
 
 @pony.db_session
 def test_tirar_dado_vale():
@@ -106,6 +118,7 @@ def test_tirar_dado_vale():
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
+
 @pony.db_session
 def test_tirar_dado_no_vale():
     j1 = db.Jugador(apodo="j1")
@@ -126,6 +139,7 @@ def test_tirar_dado_no_vale():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
+
 
 @pony.db_session
 def test_mover_jugador_vale():
@@ -154,6 +168,7 @@ def test_mover_jugador_vale():
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
+
 @pony.db_session
 def test_mover_jugador_no_turno():
     j1 = db.Jugador(apodo="j1")
@@ -178,6 +193,7 @@ def test_mover_jugador_no_turno():
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
+
 @pony.db_session
 def test_mover_jugador_no_vale():
     j1 = db.Jugador(apodo="j1")
@@ -196,7 +212,9 @@ def test_mover_jugador_no_vale():
     posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, 100)
     assert respuesta["personal_message"]["action"] == "error_imp"
-    assert respuesta["personal_message"]["data"]["message"] == "No es una posicion valida"
+    assert (
+        respuesta["personal_message"]["data"]["message"] == "No es una posicion valida"
+    )
     assert respuesta["to_broadcast"]["action"] == ""
     assert respuesta["to_broadcast"]["data"] == {}
     assert respuesta["message_to"]["action"] == ""

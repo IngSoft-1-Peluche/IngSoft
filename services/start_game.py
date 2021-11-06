@@ -3,8 +3,6 @@ from models import db
 import random
 import numpy as np
 
-from models import db
-
 from board.board import CARTAS
 
 
@@ -26,7 +24,6 @@ def asignar_orden_aleatorio(partida):
         jugador.orden_turno = i
         i += 1
     return jugadores
-
 
 
 def tirar_dado():
@@ -75,4 +72,3 @@ def distribuir_cartas(partida):
     for jugador in partida.jugadores.order_by(db.Jugador.orden_turno):
         for carta in grupos_cartas[jugador.orden_turno - 1]:
             jugador.cartas.add(carta)
-
