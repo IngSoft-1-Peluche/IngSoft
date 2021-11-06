@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from models import db, crear_jugador, crear_partida
 from sockets import ConnectionManager
 from services.start_game import (
-    asignar_orden_aleatorio,
+    iniciar_partida_service,
     tirar_dado,
     pasar_turno,
     jugador_esta_en_turno,
@@ -53,7 +53,7 @@ async def listar_partidas():
             {
                 "id_partida": p.id_partida,
                 "nombre_partida": p.nombre,
-                "cantidad_jugadores": len(p.jugadores),
+                "cantidad_jugadores": p.cantidad_jugadores(),
             }
             for p in partidas
         ]
@@ -126,8 +126,7 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
             and 1 < len(partida.jugadores) < 7
             and id_jugador == partida.creador.id_jugador
         ):
-            partida.iniciada = True
-            asignar_orden_aleatorio(partida)
+            iniciar_partida_service(partida)
             return status.HTTP_201_CREATED
         elif partida.iniciada == True:
             raise HTTPException(status_code=500, detail="La partida ya se esta jugando")
