@@ -1,7 +1,8 @@
 import pony.orm as pony
+import random
 
 from .board_functions import posiciones_posibles_a_mover
-import random
+from models import db
 
 def numero_dado():
     return random.randint(1, 6)
@@ -100,3 +101,47 @@ def mover_jugador(jugador, nueva_posicion):
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": 0}
     return {"personal_message": personal_message, "to_broadcast":to_broadcast, "message_to": message_to}
+
+@pony.db_session()
+def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
+    respuesta_personal = {"action": "acuse", "data": ""}
+    respuesta_broadcast = {"action": "acuso", "data": ""}
+    respuesta_to = {"id_jugador": "","action": "", "data": ""}
+    gano = comprobar_cartas_sobre(partida, carta_monstruo, carta_victima, carta_recinto)
+    if gano:
+        respuesta_personal["data"] = {"message": "ganaste"}
+        respuesta_broadcast["data"] = {
+            "ganador": jugador.apodo,
+            "monstruo_en_sobre": carta_monstruo,
+            "victima_en_sobre": carta_victima,
+            "recinto_en_sobre": carta_recinto
+        }
+    else:
+        respuesta_pasar_turno = pasar_turno(partida)
+        respuesta_personal["data"] = {
+            "message": "perdiste",
+            "monstruo_en_sobre": partida.monstruo_en_sobre(),
+            "victima_en_sobre": partida.victima_en_sobre(),
+            "recinto_en_sobre": partida.recinto_en_sobre()
+        }
+        respuesta_broadcast["data"] = {
+            "perdedor": jugador.apodo,
+            "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["nombre_jugador"],
+            "monstruo_acusado": carta_monstruo,
+            "victima_acusado": carta_victima,
+            "recinto_acusado": carta_recinto
+        }
+        respuesta_to = respuesta_pasar_turno["message_to"]
+    return {
+        "personal_message": respuesta_personal,
+        "to_broadcast": respuesta_broadcast,
+        "message_to": respuesta_to,
+    }
+
+@pony.db_session()
+def comprobar_cartas_sobre(partida, carta_monstruo, carta_victima, carta_recinto):
+    cartas_acusadas = [carta_monstruo, carta_victima, carta_recinto]
+    for c in partida.sobre:
+        if c.nombre not in cartas_acusadas:
+            return False
+    return True
