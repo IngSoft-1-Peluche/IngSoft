@@ -9,6 +9,7 @@ from services.start_game import (
     iniciar_partida_service,
     tirar_dado,
     pasar_turno,
+    mostrar_cartas,
 )
 from services.in_game import tirar_dado, pasar_turno, mover_jugador
 
@@ -155,6 +156,11 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         try:
             while True:
                 entrada = await websocket.receive_json()
+                respuesta = {
+                    "personal_message": {},
+                    "to_broadcast": {},
+                    "message_to": {},
+                }
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
                 if entrada["action"] == "mover_jugador":
@@ -163,6 +169,8 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     )
                 if entrada["action"] == "terminar_turno":
                     respuesta = pasar_turno(partida)
+                if entrada["action"] == "mostrar_cartas":
+                    respuesta = mostrar_cartas(jugador)
                 await manager.send_personal_message(
                     respuesta["personal_message"]["action"],
                     respuesta["personal_message"]["data"],
