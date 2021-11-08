@@ -3,7 +3,7 @@ import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import db, crear_jugador, crear_partida
+from models import db, crear_jugador, crear_partida, get_partida, get_jugador
 from my_sockets import ConnectionManager
 from services.start_game import (
     iniciar_partida_service,
@@ -78,7 +78,7 @@ async def respuesta_creacion(nueva_partida: PartidaIn) -> int:
 @app.get("/partidas/{id_partida}")
 async def detalle_partida(id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         jugadores_json = [
             {
                 "id_jugador": j.id_jugador,
@@ -99,7 +99,7 @@ async def detalle_partida(id_partida: int):
 @app.put("/partidas/{id_partida}", response_model=PartidaOut)
 async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         if len(partida.jugadores) < 6:
             jugador = crear_jugador(apodo)
             jugador.asociar_a_partida(partida)
@@ -120,7 +120,7 @@ async def unirse_a_partida(apodo: str, id_partida: int):
 @app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         if (
             partida.iniciada == False
             and 1 < len(partida.jugadores) < 7
@@ -149,8 +149,8 @@ manager = ConnectionManager()
 @app.websocket("/ws/{id_jugador}")
 async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
     with pony.db_session:
-        jugador = db.Jugador[id_jugador]
-        partida = db.Jugador[id_jugador].partida
+        jugador = get_jugador(id_jugador)
+        partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
         try:
             while True:
