@@ -45,7 +45,7 @@ class Jugador(db.Entity):
     orden_turno = pony.Optional(int)
     creador_de = pony.Optional("Partida", reverse="creador")
     partida = pony.Optional("Partida", reverse="jugadores")
-    posicion = pony.Optional(int)
+    posicion = pony.Optional(int, default=2)
     ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
 
