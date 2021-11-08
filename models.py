@@ -18,6 +18,25 @@ class Partida(db.Entity):
     @pony.db_session()
     def cantidad_jugadores(self):
         return len(self.jugadores)
+    
+    @pony.db_session()
+    def monstruo_en_sobre(self):
+        for carta in self.sobre:
+            if carta.tipo == "M":
+                return carta
+    
+    @pony.db_session()
+    def victima_en_sobre(self):
+        for carta in self.sobre:
+            if carta.tipo == "V":
+                return carta
+    
+    @pony.db_session()
+    def recinto_en_sobre(self):
+        for carta in self.sobre:
+            if carta.tipo == "R":
+                return carta
+
 
 
 class Jugador(db.Entity):

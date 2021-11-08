@@ -11,7 +11,7 @@ from services.start_game import (
     pasar_turno,
     mostrar_cartas,
 )
-from services.in_game import tirar_dado, pasar_turno, mover_jugador
+from services.in_game import tirar_dado, pasar_turno, mover_jugador, acusar
 
 app = FastAPI()
 
@@ -169,6 +169,14 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     )
                 if entrada["action"] == "terminar_turno":
                     respuesta = pasar_turno(partida)
+                if entrada["action"] == "acusar":
+                    respuesta = acusar(
+                        jugador,
+                        partida,
+                        entrada["data"]["carta_monstruo"],
+                        entrada["data"]["carta_victima"],
+                        entrada["data"]["carta_recinto"]
+                    )
                 if entrada["action"] == "mostrar_cartas":
                     respuesta = mostrar_cartas(jugador)
                 await manager.send_personal_message(
