@@ -91,6 +91,7 @@ async def detalle_partida(id_partida: int):
         return {
             "id_partida": partida.id_partida,
             "nombre": partida.nombre,
+            "iniciada": partida.iniciada,
             "jugadores": jugadores_json,
         }
 
