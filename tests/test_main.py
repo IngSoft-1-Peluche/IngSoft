@@ -7,6 +7,7 @@ from models import db
 
 from .test_board import *
 from .test_cards import *
+from .test_acusar import *
 
 client = TestClient(app)
 

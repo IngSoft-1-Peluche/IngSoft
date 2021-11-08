@@ -104,34 +104,39 @@ def mover_jugador(jugador, nueva_posicion):
 
 @pony.db_session()
 def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
-    respuesta_personal = {"action": "acuse", "data": ""}
-    respuesta_broadcast = {"action": "acuso", "data": ""}
-    respuesta_to = {"id_jugador": "","action": "", "data": ""}
-    gano = comprobar_cartas_sobre(partida, carta_monstruo, carta_victima, carta_recinto)
-    if gano:
-        respuesta_personal["data"] = {"message": "ganaste"}
-        respuesta_broadcast["data"] = {
-            "ganador": jugador.apodo,
-            "monstruo_en_sobre": carta_monstruo,
-            "victima_en_sobre": carta_victima,
-            "recinto_en_sobre": carta_recinto
-        }
+    if jugador.orden_turno == partida.jugador_en_turno:
+        respuesta_personal = {"action": "acuse", "data": ""}
+        respuesta_broadcast = {"action": "acuso", "data": ""}
+        respuesta_to = {"id_jugador": "","action": "", "data": ""}
+        gano = comprobar_cartas_sobre(partida, [carta_monstruo, carta_victima, carta_recinto])
+        if gano:
+            respuesta_personal["data"] = {"message": "ganaste"}
+            respuesta_broadcast["data"] = {
+                "ganador": jugador.apodo,
+                "monstruo_en_sobre": carta_monstruo,
+                "victima_en_sobre": carta_victima,
+                "recinto_en_sobre": carta_recinto
+            }
+        else:
+            respuesta_pasar_turno = pasar_turno(partida)
+            respuesta_personal["data"] = {
+                "message": "perdiste",
+                "monstruo_en_sobre": partida.monstruo_en_sobre().nombre,
+                "victima_en_sobre": partida.victima_en_sobre().nombre,
+                "recinto_en_sobre": partida.recinto_en_sobre().nombre
+            }
+            respuesta_broadcast["data"] = {
+                "perdedor": jugador.apodo,
+                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"]["nombre_jugador"],
+                "monstruo_acusado": carta_monstruo,
+                "victima_acusado": carta_victima,
+                "recinto_acusado": carta_recinto
+            }
+            respuesta_to = respuesta_pasar_turno["message_to"]
     else:
-        respuesta_pasar_turno = pasar_turno(partida)
-        respuesta_personal["data"] = {
-            "message": "perdiste",
-            "monstruo_en_sobre": partida.monstruo_en_sobre(),
-            "victima_en_sobre": partida.victima_en_sobre(),
-            "recinto_en_sobre": partida.recinto_en_sobre()
-        }
-        respuesta_broadcast["data"] = {
-            "perdedor": jugador.apodo,
-            "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["nombre_jugador"],
-            "monstruo_acusado": carta_monstruo,
-            "victima_acusado": carta_victima,
-            "recinto_acusado": carta_recinto
-        }
-        respuesta_to = respuesta_pasar_turno["message_to"]
+        respuesta_personal = {"action": "error_imp", "data": {"message": "No es tu turno"}}
+        respuesta_broadcast = {"action": "", "data": ""}
+        respuesta_to = {"action": "", "data": "", "id_jugador": 0}
     return {
         "personal_message": respuesta_personal,
         "to_broadcast": respuesta_broadcast,
@@ -139,8 +144,9 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
     }
 
 @pony.db_session()
-def comprobar_cartas_sobre(partida, carta_monstruo, carta_victima, carta_recinto):
-    cartas_acusadas = [carta_monstruo, carta_victima, carta_recinto]
+def comprobar_cartas_sobre(partida, cartas_acusadas):
+    if len(cartas_acusadas) != 3:
+        return False
     for c in partida.sobre:
         if c.nombre not in cartas_acusadas:
             return False
