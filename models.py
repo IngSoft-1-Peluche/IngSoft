@@ -1,4 +1,5 @@
 import pony.orm as pony
+from fastapi import HTTPException
 import random
 
 db = pony.Database()
@@ -75,6 +76,30 @@ db.generate_mapping(create_tables=True)
 
 # implementación de funciones
 @pony.db_session()
+def get_partida(id_partida):
+    try:
+        return Partida[id_partida]
+    except:
+        raise HTTPException(status_code=500, detail="No existe la partida solicitada")
+
+
+@pony.db_session()
+def get_jugador(id_jugador):
+    try:
+        return Jugador[id_jugador]
+    except:
+        raise HTTPException(status_code=500, detail="No existe el jugador solicitado")
+
+
+@pony.db_session()
+def get_carta(id_carta):
+    try:
+        return Carta[id_carta]
+    except:
+        raise HTTPException(status_code=500, detail="No existe la carta solicitada")
+
+
+@pony.db_session()
 def crear_jugador(apodo):
     jugador = Jugador(apodo=apodo)
     return jugador
@@ -82,7 +107,7 @@ def crear_jugador(apodo):
 
 @pony.db_session()
 def crear_partida(nombre, id_jugador):
-    jugador = Jugador[id_jugador]
+    jugador = get_jugador(id_jugador)
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
     jugador.asociar_a_partida(partida)
     return partida
