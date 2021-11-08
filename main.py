@@ -3,10 +3,11 @@ import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
-from models import db, crear_jugador, crear_partida
+from models import db, crear_jugador, crear_partida, get_partida, get_jugador
 from my_sockets import ConnectionManager
 from services.start_game import (
     iniciar_partida_service,
+    mostrar_cartas,
 )
 from services.in_game import (
     tirar_dado,
@@ -14,6 +15,7 @@ from services.in_game import (
     mover_jugador,
     anunciar_sospecha,
     responder_sospecha,
+    acusar
 )
 
 app = FastAPI()
@@ -82,7 +84,7 @@ async def respuesta_creacion(nueva_partida: PartidaIn) -> int:
 @app.get("/partidas/{id_partida}")
 async def detalle_partida(id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         jugadores_json = [
             {
                 "id_jugador": j.id_jugador,
@@ -95,6 +97,7 @@ async def detalle_partida(id_partida: int):
         return {
             "id_partida": partida.id_partida,
             "nombre": partida.nombre,
+            "iniciada": partida.iniciada,
             "jugadores": jugadores_json,
         }
 
@@ -102,7 +105,7 @@ async def detalle_partida(id_partida: int):
 @app.put("/partidas/{id_partida}", response_model=PartidaOut)
 async def unirse_a_partida(apodo: str, id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         if len(partida.jugadores) < 6:
             jugador = crear_jugador(apodo)
             jugador.asociar_a_partida(partida)
@@ -123,7 +126,7 @@ async def unirse_a_partida(apodo: str, id_partida: int):
 @app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
 async def iniciar_partida(id_jugador: int, id_partida: int):
     with pony.db_session:
-        partida = db.Partida[id_partida]
+        partida = get_partida(id_partida)
         if (
             partida.iniciada == False
             and 1 < len(partida.jugadores) < 7
@@ -152,12 +155,17 @@ manager = ConnectionManager()
 @app.websocket("/ws/{id_jugador}")
 async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
     with pony.db_session:
-        jugador = db.Jugador[id_jugador]
-        partida = db.Jugador[id_jugador].partida
+        jugador = get_jugador(id_jugador)
+        partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
         try:
             while True:
                 entrada = await websocket.receive_json()
+                respuesta = {
+                    "personal_message": {},
+                    "to_broadcast": {},
+                    "message_to": {},
+                }
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
                 if entrada["action"] == "mover_jugador":
@@ -174,6 +182,16 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     )
                 if entrada["action"] == "respuesta_sospecha":
                     respuesta = responder_sospecha(jugador, entrada["data"]["carta"])
+                if entrada["action"] == "acusar":
+                    respuesta = acusar(
+                        jugador,
+                        partida,
+                        entrada["data"]["carta_monstruo"],
+                        entrada["data"]["carta_victima"],
+                        entrada["data"]["carta_recinto"]
+                    )
+                if entrada["action"] == "mostrar_cartas":
+                    respuesta = mostrar_cartas(jugador)
                 await manager.send_personal_message(
                     respuesta["personal_message"]["action"],
                     respuesta["personal_message"]["data"],
