@@ -1,7 +1,7 @@
 import pony.orm as pony
 
 from .board_functions import posiciones_posibles_a_mover
-from board.board import RECINTOS, CARTAS
+from board.board import RECINTOS
 import random
 
 
@@ -56,7 +56,9 @@ def tirar_dado(jugador, partida):
         dado = numero_dado()
         jugador.ultima_tirada = dado
         casillas_a_mover = posiciones_posibles_a_mover(jugador.posicion, dado)
+
         data1 = {"numero_dado": dado, "casillas_a_mover": casillas_a_mover}
+
         data2 = {"nombre_jugador": jugador.apodo, "numero_dado": dado}
         data3 = {}
         personal_message = {"action": action1, "data": data1}
@@ -109,7 +111,7 @@ def mover_jugador(jugador, nueva_posicion):
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
     else:
-        action1 = "error_imp"
+        action1 = "casilla_invalida"
         action2 = ""
         action3 = ""
         data1 = {"message": "No es una posicion valida"}
@@ -177,7 +179,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
                 "data": data3,
                 "id_jugador": jugador_que_muestra.id_jugador,
             }
-    elif (jugador.posicion not in RECINTOS.keys()):
+    elif jugador.posicion not in RECINTOS.keys():
         action1 = "no_recinto"
         action2 = ""
         action3 = ""
@@ -192,7 +194,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             "id_jugador": -1,
         }
     else:
-        action1 = "no_turno"
+        action1 = "error_imp"
         action2 = ""
         action3 = ""
         data1 = {"message": "No es tu turno"}
@@ -211,6 +213,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         "message_to": message_to,
     }
 
+
 def responder_sospecha(jugador, carta):
     action1 = "no_carta"
     action2 = ""
@@ -220,7 +223,7 @@ def responder_sospecha(jugador, carta):
     data3 = {}
     cartas = []
     for c in jugador.cartas:
-            cartas.append(c.nombre)
+        cartas.append(c.nombre)
     if carta in cartas:
         action1 = "muestra_carta"
         data1 = {}
@@ -228,11 +231,7 @@ def responder_sospecha(jugador, carta):
         data3 = {"carta_seleccionada": carta}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
-    message_to = {
-        "action": action3,
-        "data": data3,
-        "id_jugador": jugador.id_jugador
-    }
+    message_to = {"action": action3, "data": data3, "id_jugador": jugador.id_jugador}
 
     return {
         "personal_message": personal_message,

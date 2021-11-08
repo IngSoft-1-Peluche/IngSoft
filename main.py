@@ -8,7 +8,13 @@ from my_sockets import ConnectionManager
 from services.start_game import (
     iniciar_partida_service,
 )
-from services.in_game import tirar_dado, pasar_turno, mover_jugador, anunciar_sospecha, responder_sospecha
+from services.in_game import (
+    tirar_dado,
+    pasar_turno,
+    mover_jugador,
+    anunciar_sospecha,
+    responder_sospecha,
+)
 
 app = FastAPI()
 
@@ -162,7 +168,9 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta = pasar_turno(partida)
                 if entrada["action"] == "sospechan":
                     respuesta = anunciar_sospecha(
-                        jugador, entrada["data"]["carta_monstruo"], entrada["data"]["carta_victima"]
+                        jugador,
+                        entrada["data"]["carta_monstruo"],
+                        entrada["data"]["carta_victima"],
                     )
                 if entrada["action"] == "respuesta_sospecha":
                     respuesta = responder_sospecha(jugador, entrada["data"]["carta"])

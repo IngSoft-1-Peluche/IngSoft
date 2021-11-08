@@ -1,4 +1,3 @@
-
 import pony.orm as pony
 from services.in_game import (
     numero_dado,
@@ -8,7 +7,7 @@ from services.in_game import (
     tirar_dado,
     mover_jugador,
     anunciar_sospecha,
-    responder_sospecha
+    responder_sospecha,
 )
 from services.board_functions import posiciones_posibles_a_mover
 from models import Partida, Jugador, db
@@ -107,13 +106,15 @@ def test_tirar_dado_vale():
     j2.asociar_a_partida(mi_partida_de_2)
     j1.orden_turno = 1
     j2.orden_turno = 2
+    j2.posicion = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
     respuesta = tirar_dado(j2, mi_partida_de_2)
+
     assert respuesta["personal_message"]["action"] == "tire_dado"
     assert type(respuesta["personal_message"]["data"]["numero_dado"]) == int
     assert 0 < respuesta["personal_message"]["data"]["numero_dado"] < 7
-    assert type(respuesta["personal_message"]["data"]["casillas_a_mover"]) == list
+    assert respuesta["personal_message"]["data"]["casillas_a_mover"] != None
     assert respuesta["to_broadcast"]["action"] == "tiraron_dado"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert 0 < respuesta["to_broadcast"]["data"]["numero_dado"] < 7
@@ -160,7 +161,11 @@ def test_mover_jugador_vale():
     pony.commit()
     _ = tirar_dado(j2, mi_partida_de_2)
     posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
+    print("\n")
+    print(j2.ultima_tirada)
+    print(posibles_casillas)
     respuesta = mover_jugador(j2, posibles_casillas[0])
+    print(respuesta["personal_message"]["action"])
     assert (j2.posicion in posibles_casillas) == True
     assert respuesta["personal_message"]["action"] == "me_movi"
     assert respuesta["personal_message"]["data"]["posicion_final"] == j2.posicion
@@ -224,12 +229,13 @@ def test_mover_jugador_no_vale():
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
+
 @pony.db_session
 def test_anunciar_sospecha_vale():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
-    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo="M")
     pony.flush()
     mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
     j1.asociar_a_partida(mi_partida_de_2)
@@ -248,12 +254,13 @@ def test_anunciar_sospecha_vale():
     assert respuesta["message_to"]["action"] == "muestra"
     assert respuesta["message_to"]["id_jugador"] == j3.id_jugador
 
+
 @pony.db_session
 def test_anunciar_sospecha_no_turno():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
-    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo="M")
     pony.flush()
     mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
     j1.asociar_a_partida(mi_partida_de_2)
@@ -272,12 +279,13 @@ def test_anunciar_sospecha_no_turno():
     assert respuesta["personal_message"]["action"] == "no_turno"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
 
+
 @pony.db_session
 def test_anunciar_sospecha_fail():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
-    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo="M")
     pony.flush()
     mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
     j1.asociar_a_partida(mi_partida_de_2)
@@ -295,15 +303,19 @@ def test_anunciar_sospecha_fail():
     respuesta = anunciar_sospecha(j1, "carta_prueba_3", "carta_prueba_2")
     assert respuesta["to_broadcast"]["action"] == "cartas_sospechadas_fail"
     assert respuesta["to_broadcast"]["data"]["nombre_sospechador"] == j1.apodo
-    assert respuesta["to_broadcast"]["data"]["cartas_sospechadas"] == ["Cochera", "carta_prueba_3", "carta_prueba_2"]
-    
+    assert respuesta["to_broadcast"]["data"]["cartas_sospechadas"] == [
+        "Cochera",
+        "carta_prueba_3",
+        "carta_prueba_2",
+    ]
+
 
 @pony.db_session
 def test_responder_sospecha_vale():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
-    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo="M")
     pony.flush()
     mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
     j1.asociar_a_partida(mi_partida_de_2)
@@ -324,12 +336,13 @@ def test_responder_sospecha_vale():
     assert respuesta["message_to"]["action"] == "carta_seleccionada"
     assert respuesta["message_to"]["data"]["carta_seleccionada"] == "carta_prueba_1"
 
+
 @pony.db_session
 def test_responder_sospecha_no_vale():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
-    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo="M")
     pony.flush()
     mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
     j1.asociar_a_partida(mi_partida_de_2)
@@ -348,4 +361,7 @@ def test_responder_sospecha_no_vale():
     respuesta = responder_sospecha(j3, "carta_prueba_2")
     pony.commit()
     assert respuesta["personal_message"]["action"] == "no_carta"
-    assert respuesta["personal_message"]["data"]["message"] == "No tienes esa carta para mostrar"
+    assert (
+        respuesta["personal_message"]["data"]["message"]
+        == "No tienes esa carta para mostrar"
+    )
