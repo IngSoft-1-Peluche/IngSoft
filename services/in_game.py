@@ -172,11 +172,69 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data3 = {}
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
+            partida.jugador_que_muestra = jugador_que_muestra
             message_to = {
                 "action": action3,
                 "data": data3,
                 "id_jugador": jugador_que_muestra.id_jugador,
             }
+    elif (jugador.posicion not in RECINTOS.keys()):
+        action1 = "no_recinto"
+        action2 = ""
+        action3 = ""
+        data1 = {"message": "No estás en un recinto"}
+        data2 = {}
+        data3 = {}
+        personal_message = {"action": action1, "data": data1}
+        to_broadcast = {"action": action2, "data": data2}
+        message_to = {
+            "action": action3,
+            "data": data3,
+            "id_jugador": -1,
+        }
+    else:
+        action1 = "no_turno"
+        action2 = ""
+        action3 = ""
+        data1 = {"message": "No es tu turno"}
+        data2 = {}
+        data3 = {}
+        personal_message = {"action": action1, "data": data1}
+        to_broadcast = {"action": action2, "data": data2}
+        message_to = {
+            "action": action3,
+            "data": data3,
+            "id_jugador": -1,
+        }
+    return {
+        "personal_message": personal_message,
+        "to_broadcast": to_broadcast,
+        "message_to": message_to,
+    }
+
+def responder_sospecha(jugador, carta):
+    action1 = "no_carta"
+    action2 = ""
+    action3 = ""
+    data1 = {"message": "No tienes esa carta para mostrar"}
+    data2 = {}
+    data3 = {}
+    cartas = []
+    for c in jugador.cartas:
+            cartas.append(c.nombre)
+    if carta in cartas:
+        action1 = "muestra_carta"
+        data1 = {}
+        action3 = "carta_seleccionada"
+        data3 = {"carta_seleccionada": carta}
+    personal_message = {"action": action1, "data": data1}
+    to_broadcast = {"action": action2, "data": data2}
+    message_to = {
+        "action": action3,
+        "data": data3,
+        "id_jugador": jugador.partida.jugador_que_muestra.id_jugador
+    }
+
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,

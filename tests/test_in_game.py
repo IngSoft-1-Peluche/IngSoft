@@ -7,7 +7,8 @@ from services.in_game import (
     jugador_esta_en_turno,
     tirar_dado,
     mover_jugador,
-    anunciar_sospecha
+    anunciar_sospecha,
+    responder_sospecha
 )
 from services.board_functions import posiciones_posibles_a_mover
 from models import Partida, Jugador, db
@@ -224,7 +225,7 @@ def test_mover_jugador_no_vale():
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 @pony.db_session
-def test_anunciar_sospecha():
+def test_anunciar_sospecha_vale():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
     j3 = db.Jugador(apodo="j3")
@@ -246,3 +247,105 @@ def test_anunciar_sospecha():
     respuesta = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     assert respuesta["message_to"]["action"] == "muestra"
     assert respuesta["message_to"]["id_jugador"] == j3.id_jugador
+
+@pony.db_session
+def test_anunciar_sospecha_no_turno():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    pony.flush()
+    mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_2)
+    j2.asociar_a_partida(mi_partida_de_2)
+    j3.asociar_a_partida(mi_partida_de_2)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j3.orden_turno = 3
+    j1.posicion = 1
+    j2.posicion = 2
+    j2.posicion = 3
+    j3.cartas.add(carta1)
+    mi_partida_de_2.jugador_en_turno = 1
+    pony.commit()
+    respuesta = anunciar_sospecha(j2, "carta_prueba_1", "carta_prueba_2")
+    assert respuesta["personal_message"]["action"] == "no_turno"
+    assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
+
+@pony.db_session
+def test_anunciar_sospecha_fail():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    pony.flush()
+    mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_2)
+    j2.asociar_a_partida(mi_partida_de_2)
+    j3.asociar_a_partida(mi_partida_de_2)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j3.orden_turno = 3
+    j1.posicion = 1
+    j2.posicion = 2
+    j2.posicion = 3
+    j3.cartas.add(carta1)
+    mi_partida_de_2.jugador_en_turno = 1
+    pony.commit()
+    respuesta = anunciar_sospecha(j1, "carta_prueba_3", "carta_prueba_2")
+    assert respuesta["to_broadcast"]["action"] == "cartas_sospechadas_fail"
+    assert respuesta["to_broadcast"]["data"]["nombre_sospechador"] == j1.apodo
+    assert respuesta["to_broadcast"]["data"]["cartas_sospechadas"] == ["Cochera", "carta_prueba_3", "carta_prueba_2"]
+    
+
+@pony.db_session
+def test_responder_sospecha_vale():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    pony.flush()
+    mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_2)
+    j2.asociar_a_partida(mi_partida_de_2)
+    j3.asociar_a_partida(mi_partida_de_2)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j3.orden_turno = 3
+    j1.posicion = 1
+    j2.posicion = 2
+    j2.posicion = 3
+    j3.cartas.add(carta1)
+    mi_partida_de_2.jugador_en_turno = 1
+    _ = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
+    pony.commit()
+    respuesta = responder_sospecha(j3, "carta_prueba_1")
+    pony.commit()
+    assert respuesta["message_to"]["action"] == "carta_seleccionada"
+    assert respuesta["message_to"]["data"]["carta_seleccionada"] == "carta_prueba_1"
+
+@pony.db_session
+def test_responder_sospecha_no_vale():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    carta1 = db.Carta(nombre="carta_prueba_1", tipo= "M")
+    pony.flush()
+    mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_2)
+    j2.asociar_a_partida(mi_partida_de_2)
+    j3.asociar_a_partida(mi_partida_de_2)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j3.orden_turno = 3
+    j1.posicion = 1
+    j2.posicion = 2
+    j2.posicion = 3
+    j3.cartas.add(carta1)
+    mi_partida_de_2.jugador_en_turno = 1
+    _ = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
+    pony.commit()
+    respuesta = responder_sospecha(j3, "carta_prueba_2")
+    pony.commit()
+    assert respuesta["personal_message"]["action"] == "no_carta"
+    assert respuesta["personal_message"]["data"]["message"] == "No tienes esa carta para mostrar"
