@@ -1,6 +1,6 @@
 import numpy as np
 
-COLORES = ["rojo", "verde", "azul", "amarillo", "celeste", "naranja"]
+COLORES = ["red", "green", "blue", "yellow", "deepskyblue", "orange"]
 
 TIPOS_CASILLAS = {"C": "Casilla común", "R": "Recinto"}
 
