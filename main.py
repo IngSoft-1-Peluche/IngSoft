@@ -162,9 +162,9 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
             while True:
                 entrada = await websocket.receive_json()
                 respuesta = {
-                    "personal_message": {},
-                    "to_broadcast": {},
-                    "message_to": {},
+                    "personal_message": {"action": "error_imp", "data": "No existe esa accion"},
+                    "to_broadcast": {"action": "", "data": ""},
+                    "message_to": {"action": "", "data": "", "id_jugador": ""},
                 }
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)

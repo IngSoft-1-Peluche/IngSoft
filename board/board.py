@@ -49,7 +49,7 @@ CARTAS = [
     ("Jardinero", "V"),
     ("Mayordomo", "V"),
     ("Dr Jekyll Mr Hyde", "M"),
-    ("Drácula", "M"),
+    ("Dracula", "M"),
     ("Fantasma", "M"),
     ("Frankenstein", "M"),
     ("Hombre lobo", "M"),
