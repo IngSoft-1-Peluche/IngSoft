@@ -78,7 +78,7 @@ def distribuir_cartas(partida):
 def mostrar_cartas(jugador):
     respuesta = {"action": "", "data": ""}
     respuesta_broadcast = {"action": "", "data": ""}
-    respuesta_to = {"action": "", "data": "", "id_jugador": ""}
+    respuesta_to = {"action": "", "data": "", "id_jugador": -1}
     respuesta["action"] = "mostrar_cartas"
     data = {"cartas": []}
     for carta in jugador.cartas:
