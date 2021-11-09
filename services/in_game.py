@@ -14,9 +14,9 @@ def pasar_turno(partida):
     action1 = ""
     action2 = "terminaron_turno"
     action3 = "tu_turno"
-    data1 = {}
+    data1 = ""
     data2 = {"nombre_jugador": jugador_siguiente.apodo}
-    data3 = {}
+    data3 = ""
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
@@ -60,7 +60,7 @@ def tirar_dado(jugador, partida):
         data1 = {"numero_dado": dado, "casillas_a_mover": casillas_a_mover}
 
         data2 = {"nombre_jugador": jugador.apodo, "numero_dado": dado}
-        data3 = {}
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
@@ -69,10 +69,10 @@ def tirar_dado(jugador, partida):
         data1 = {"message": "No es tu turno"}
         personal_message = {"action": action1, "data": data1}
         action2 = ""
-        data2 = {}
+        data2 = ""
         to_broadcast = {"action": action2, "data": data2}
         action3 = ""
-        data3 = {}
+        data3 = ""
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
     return {
         "personal_message": personal_message,
@@ -96,7 +96,7 @@ def mover_jugador(jugador, nueva_posicion):
         action3 = ""
         data1 = {"posicion_final": nueva_posicion}
         data2 = {"nombre_jugador": jugador.apodo, "posicion_final": nueva_posicion}
-        data3 = {}
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
@@ -105,8 +105,8 @@ def mover_jugador(jugador, nueva_posicion):
         action2 = ""
         action3 = ""
         data1 = {"message": "No es tu turno"}
-        data2 = {}
-        data3 = {}
+        data2 = ""
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
@@ -115,8 +115,8 @@ def mover_jugador(jugador, nueva_posicion):
         action2 = ""
         action3 = ""
         data1 = {"message": "No es una posicion valida"}
-        data2 = {}
-        data3 = {}
+        data2 = ""
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
@@ -149,12 +149,12 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             action1 = ""
             action2 = "cartas_sospechadas_fail"
             action3 = ""
-            data1 = {}
+            data1 = ""
             data2 = {
                 "nombre_sospechador": jugador.apodo,
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
-            data3 = {}
+            data3 = ""
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -167,12 +167,12 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             action1 = ""
             action2 = "cartas_sospechadas"
             action3 = "muestra"
-            data1 = {}
+            data1 = ""
             data2 = {
                 "nombre_sospechador": jugador.apodo,
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
-            data3 = {}
+            data3 = ""
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -185,8 +185,8 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         action2 = ""
         action3 = ""
         data1 = {"message": "No estás en un recinto"}
-        data2 = {}
-        data3 = {}
+        data2 = ""
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {
@@ -199,8 +199,8 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         action2 = ""
         action3 = ""
         data1 = {"message": "No es tu turno"}
-        data2 = {}
-        data3 = {}
+        data2 = ""
+        data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {
@@ -221,8 +221,8 @@ def responder_sospecha(jugador, carta):
     action2 = ""
     action3 = ""
     data1 = {"message": "No tienes esa carta para mostrar"}
-    data2 = {}
-    data3 = {}
+    data2 = ""
+    data3 = ""
     cartas = []
     for c in jugador.cartas:
         cartas.append(c.nombre)
