@@ -12,8 +12,10 @@ class Partida(db.Entity):
     creador = pony.Required("Jugador", reverse="creador_de")
     jugadores = pony.Set("Jugador", reverse="partida")
     jugador_en_turno = pony.Optional(int, default=1)
+    jugador_que_sospecha = pony.Optional("Jugador", reverse="sospecha")
     cartas = pony.Set("Carta", reverse="partida")
     sobre = pony.Set("Carta", reverse="sobre")
+
 
     @pony.db_session()
     def cantidad_jugadores(self):
@@ -48,6 +50,7 @@ class Jugador(db.Entity):
     posicion = pony.Optional(int, default=2)
     ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
+    sospecha = pony.Optional("Partida", reverse="jugador_que_sospecha")
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
