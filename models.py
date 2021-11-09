@@ -51,6 +51,7 @@ class Jugador(db.Entity):
     ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
     sospecha = pony.Optional("Partida", reverse="jugador_que_sospecha")
+    color = pony.Optional(str)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
