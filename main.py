@@ -151,6 +151,32 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
 
 manager = ConnectionManager()
 
+@app.websocket("/ws/{id_jugador}")
+async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
+    with pony.db_session:
+        jugador = get_jugador(id_jugador)
+        partida = jugador.partida
+        await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
+        respuesta = {"personal_message": {"action": "prueba"}, "data":""}
+        await manager.send_personal_message(
+                    respuesta["personal_message"]["action"],
+                    respuesta["personal_message"]["data"],
+                    websocket,
+                )
+        try:
+            while True:
+                manager.send_personal_message(
+                    "spam",
+                    "spam",
+                    websocket,
+                )
+        except WebSocketDisconnect:
+            manager.disconnect(websocket)
+            await manager.broadcast(
+                f"Desconectado",
+                f"El jugador #{id_jugador} se fue de la partida",
+                partida.id_partida,
+            )
 
 @app.websocket("/ws/{id_jugador}")
 async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
