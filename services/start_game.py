@@ -77,7 +77,8 @@ def distribuir_cartas(partida):
 @pony.db_session()
 def mostrar_cartas(jugador):
     respuesta = {"action": "", "data": ""}
-    respuesta_vacia = {"action": "", "data": ""}
+    respuesta_broadcast = {"action": "", "data": ""}
+    respuesta_to = {"action": "", "data": "", "id_jugador": ""}
     respuesta["action"] = "mostrar_cartas"
     data = {"cartas": []}
     for carta in jugador.cartas:
@@ -85,6 +86,6 @@ def mostrar_cartas(jugador):
     respuesta["data"] = data
     return {
         "personal_message": respuesta,
-        "to_broadcast": respuesta_vacia,
-        "message_to": respuesta_vacia,
+        "to_broadcast": respuesta_broadcast,
+        "message_to": respuesta_to,
     }
