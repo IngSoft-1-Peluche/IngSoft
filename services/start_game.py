@@ -3,13 +3,15 @@ from models import db
 import random
 import numpy as np
 
-from board.board import CARTAS
+from board.board import CARTAS, PUERTAS, COLORES
 
 
 @pony.db_session()
 def iniciar_partida_service(partida):
     partida.iniciada = True
     asignar_orden_aleatorio(partida)
+    asignar_posiciones_iniciales(partida)
+    asignar_colores(partida)
     crear_cartas(partida)
     generar_sobre(partida)
     distribuir_cartas(partida)
@@ -22,6 +24,26 @@ def asignar_orden_aleatorio(partida):
     i = 1
     for jugador in jugadores:
         jugador.orden_turno = i
+        i += 1
+    return jugadores
+
+
+@pony.db_session()
+def asignar_posiciones_iniciales(partida):
+    jugadores = partida.jugadores
+    random.shuffle(list(jugadores))
+    for jugador in jugadores:
+        jugador.posicion = random.choice(PUERTAS)
+    return jugadores
+
+
+@pony.db_session()
+def asignar_colores(partida):
+    jugadores = partida.jugadores
+    random.shuffle(list(jugadores))
+    i = 0
+    for jugador in jugadores:
+        jugador.color = COLORES[i]
         i += 1
     return jugadores
 
