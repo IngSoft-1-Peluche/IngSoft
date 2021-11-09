@@ -160,12 +160,8 @@ def test_mover_jugador_vale():
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
     _ = tirar_dado(j2, mi_partida_de_2)
-    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
-    print("\n")
-    print(j2.ultima_tirada)
-    print(posibles_casillas)
+    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)   
     respuesta = mover_jugador(j2, posibles_casillas[0])
-    print(respuesta["personal_message"]["action"])
     assert (j2.posicion in posibles_casillas) == True
     assert respuesta["personal_message"]["action"] == "me_movi"
     assert respuesta["personal_message"]["data"]["posicion_final"] == j2.posicion
@@ -219,7 +215,7 @@ def test_mover_jugador_no_vale():
     _ = tirar_dado(j2, mi_partida_de_2)
     posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, 100)
-    assert respuesta["personal_message"]["action"] == "error_imp"
+    assert respuesta["personal_message"]["action"] == "casilla_invalida"
     assert (
         respuesta["personal_message"]["data"]["message"] == "No es una posicion valida"
     )
@@ -276,7 +272,7 @@ def test_anunciar_sospecha_no_turno():
     mi_partida_de_2.jugador_en_turno = 1
     pony.commit()
     respuesta = anunciar_sospecha(j2, "carta_prueba_1", "carta_prueba_2")
-    assert respuesta["personal_message"]["action"] == "no_turno"
+    assert respuesta["personal_message"]["action"] == "error_imp"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
 
 
@@ -335,6 +331,7 @@ def test_responder_sospecha_vale():
     pony.commit()
     assert respuesta["message_to"]["action"] == "carta_seleccionada"
     assert respuesta["message_to"]["data"]["carta_seleccionada"] == "carta_prueba_1"
+    assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
 
 
 @pony.db_session

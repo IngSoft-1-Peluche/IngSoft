@@ -163,6 +163,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
                 "id_jugador": -1,
             }
         else:
+            partida.jugador_que_sospecha = jugador
             action1 = ""
             action2 = "cartas_sospechadas"
             action3 = "muestra"
@@ -215,6 +216,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
 
 
 def responder_sospecha(jugador, carta):
+    partida = jugador.partida
     action1 = "no_carta"
     action2 = ""
     action3 = ""
@@ -231,7 +233,7 @@ def responder_sospecha(jugador, carta):
         data3 = {"carta_seleccionada": carta}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
-    message_to = {"action": action3, "data": data3, "id_jugador": jugador.id_jugador}
+    message_to = {"action": action3, "data": data3, "id_jugador": partida.jugador_que_sospecha.id_jugador}
 
     return {
         "personal_message": personal_message,
