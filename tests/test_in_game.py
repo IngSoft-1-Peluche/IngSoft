@@ -1,5 +1,7 @@
 import pony.orm as pony
+from services.start_game import iniciar_partida_service
 from services.in_game import (
+    estado_jugadores,
     numero_dado,
     siguiente_jugador,
     pasar_turno,
@@ -160,7 +162,7 @@ def test_mover_jugador_vale():
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
     _ = tirar_dado(j2, mi_partida_de_2)
-    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)   
+    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, posibles_casillas[0])
     assert (j2.posicion in posibles_casillas) == True
     assert respuesta["personal_message"]["action"] == "me_movi"
@@ -362,3 +364,29 @@ def test_responder_sospecha_no_vale():
         respuesta["personal_message"]["data"]["message"]
         == "No tienes esa carta para mostrar"
     )
+
+
+@pony.db_session
+def test_estado_jugadores():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    pony.flush()
+    partida = db.Partida(nombre="Partida para estado jugadores", creador=j1)
+    j1.asociar_a_partida(partida)
+    j2.asociar_a_partida(partida)
+    j3.asociar_a_partida(partida)
+    iniciar_partida_service(partida)
+    pony.commit()
+
+    respuesta = estado_jugadores(partida)
+    assert respuesta["personal_message"]["action"] == "estado_jugadores"
+    assert len(respuesta["personal_message"]["data"]["lista_jugadores"]) == 3
+    assert list(respuesta["personal_message"]["data"]["lista_jugadores"][0].keys()) == [
+        "id_jugador",
+        "apodo",
+        "color",
+        "posicion",
+        "orden",
+        "en_turno",
+    ]
