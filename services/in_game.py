@@ -271,7 +271,6 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
                 "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"]["nombre_jugador"],
-                "lista_jugadores": respuesta_pasar_turno["to_broadcast"]["data"]["lista_jugadores"],
                 "monstruo_acusado": carta_monstruo,
                 "victima_acusado": carta_victima,
                 "recinto_acusado": carta_recinto
