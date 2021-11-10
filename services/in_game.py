@@ -95,7 +95,11 @@ def mover_jugador(jugador, nueva_posicion):
         action2 = "se_movio"
         action3 = ""
         data1 = {"posicion_final": nueva_posicion}
-        data2 = {"nombre_jugador": jugador.apodo, "posicion_final": nueva_posicion}
+        data2 = {
+            "nombre_jugador": jugador.apodo,
+            "posicion_final": nueva_posicion,
+            "lista_jugadores": lista_estado_jugadores(partida)
+        }
         data3 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
@@ -267,6 +271,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
                 "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"]["nombre_jugador"],
+                "lista_jugadores": respuesta_pasar_turno["to_broadcast"]["data"]["lista_jugadores"],
                 "monstruo_acusado": carta_monstruo,
                 "victima_acusado": carta_victima,
                 "recinto_acusado": carta_recinto
@@ -290,3 +295,27 @@ def comprobar_cartas_sobre(partida, cartas_acusadas):
         if c.nombre not in cartas_acusadas:
             return False
     return True
+
+
+@pony.db_session()
+def estado_jugadores(partida):
+    lista = lista_estado_jugadores(partida)
+    respuesta_personal = {
+        "action": "estado_jugadores",
+        "data": {"lista_jugadores": lista}
+    }
+    return {"personal_message": respuesta_personal}
+
+@pony.db_session()
+def lista_estado_jugadores(partida):
+    lista = []
+    for jugador in partida.jugadores:
+        lista.append({
+            "id_jugador": jugador.id_jugador,
+            "apodo": jugador.apodo,
+            "color": jugador.color,
+            "posicion": jugador.posicion,
+            "orden": jugador.orden_turno,
+            "en_turno": jugador.orden_turno == partida.jugador_en_turno
+        })
+    return lista
