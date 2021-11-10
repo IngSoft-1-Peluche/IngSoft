@@ -9,6 +9,7 @@ from models import db
 def numero_dado():
     return random.randint(1, 6)
 
+
 def pasar_turno(partida):
     jugador_siguiente = siguiente_jugador(partida)
     action1 = ""
@@ -98,7 +99,7 @@ def mover_jugador(jugador, nueva_posicion):
         data2 = {
             "nombre_jugador": jugador.apodo,
             "posicion_final": nueva_posicion,
-            "lista_jugadores": lista_estado_jugadores(partida)
+            "lista_jugadores": lista_estado_jugadores(partida),
         }
         data3 = ""
         personal_message = {"action": action1, "data": data1}
@@ -237,7 +238,11 @@ def responder_sospecha(jugador, carta):
         data3 = {"carta_seleccionada": carta}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
-    message_to = {"action": action3, "data": data3, "id_jugador": partida.jugador_que_sospecha.id_jugador}
+    message_to = {
+        "action": action3,
+        "data": data3,
+        "id_jugador": partida.jugador_que_sospecha.id_jugador,
+    }
 
     return {
         "personal_message": personal_message,
@@ -245,20 +250,23 @@ def responder_sospecha(jugador, carta):
         "message_to": message_to,
     }
 
+
 @pony.db_session()
 def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
     if jugador.orden_turno == partida.jugador_en_turno:
         respuesta_personal = {"action": "acuse", "data": ""}
         respuesta_broadcast = {"action": "acuso", "data": ""}
-        respuesta_to = {"id_jugador": "","action": "", "data": ""}
-        gano = comprobar_cartas_sobre(partida, [carta_monstruo, carta_victima, carta_recinto])
+        respuesta_to = {"id_jugador": "", "action": "", "data": ""}
+        gano = comprobar_cartas_sobre(
+            partida, [carta_monstruo, carta_victima, carta_recinto]
+        )
         if gano:
             respuesta_personal["data"] = {"message": "ganaste"}
             respuesta_broadcast["data"] = {
                 "ganador": jugador.apodo,
                 "monstruo_en_sobre": carta_monstruo,
                 "victima_en_sobre": carta_victima,
-                "recinto_en_sobre": carta_recinto
+                "recinto_en_sobre": carta_recinto,
             }
         else:
             respuesta_pasar_turno = pasar_turno(partida)
@@ -266,18 +274,23 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
                 "message": "perdiste",
                 "monstruo_en_sobre": partida.monstruo_en_sobre().nombre,
                 "victima_en_sobre": partida.victima_en_sobre().nombre,
-                "recinto_en_sobre": partida.recinto_en_sobre().nombre
+                "recinto_en_sobre": partida.recinto_en_sobre().nombre,
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
-                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"]["nombre_jugador"],
+                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
+                    "nombre_jugador"
+                ],
                 "monstruo_acusado": carta_monstruo,
                 "victima_acusado": carta_victima,
-                "recinto_acusado": carta_recinto
+                "recinto_acusado": carta_recinto,
             }
             respuesta_to = respuesta_pasar_turno["message_to"]
     else:
-        respuesta_personal = {"action": "error_imp", "data": {"message": "No es tu turno"}}
+        respuesta_personal = {
+            "action": "error_imp",
+            "data": {"message": "No es tu turno"},
+        }
         respuesta_broadcast = {"action": "", "data": ""}
         respuesta_to = {"action": "", "data": "", "id_jugador": 0}
     return {
@@ -285,6 +298,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
         "to_broadcast": respuesta_broadcast,
         "message_to": respuesta_to,
     }
+
 
 @pony.db_session()
 def comprobar_cartas_sobre(partida, cartas_acusadas):
@@ -301,20 +315,23 @@ def estado_jugadores(partida):
     lista = lista_estado_jugadores(partida)
     respuesta_personal = {
         "action": "estado_jugadores",
-        "data": {"lista_jugadores": lista}
+        "data": {"lista_jugadores": lista},
     }
     return {"personal_message": respuesta_personal}
+
 
 @pony.db_session()
 def lista_estado_jugadores(partida):
     lista = []
     for jugador in partida.jugadores:
-        lista.append({
-            "id_jugador": jugador.id_jugador,
-            "apodo": jugador.apodo,
-            "color": jugador.color,
-            "posicion": jugador.posicion,
-            "orden": jugador.orden_turno,
-            "en_turno": jugador.orden_turno == partida.jugador_en_turno
-        })
+        lista.append(
+            {
+                "id_jugador": jugador.id_jugador,
+                "apodo": jugador.apodo,
+                "color": jugador.color,
+                "posicion": jugador.posicion,
+                "orden": jugador.orden_turno,
+                "en_turno": jugador.orden_turno == partida.jugador_en_turno,
+            }
+        )
     return lista
