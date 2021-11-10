@@ -16,7 +16,7 @@ def pasar_turno(partida):
     action3 = "tu_turno"
     data1 = ""
     data2 = {"nombre_jugador": jugador_siguiente.apodo}
-    data3 = ""
+    data3 = {}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
