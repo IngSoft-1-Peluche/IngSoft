@@ -164,7 +164,12 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-        respuesta = jugador_conectado(jugador, partida)
+        conexion = jugador_conectado(jugador, partida)
+        await manager.broadcast(
+                    conexion["to_broadcast"]["action"],
+                    conexion["to_broadcast"]["data"],
+                    partida.id_partida,
+                )
         try:
             while True:
                 entrada = await websocket.receive_json()
