@@ -9,7 +9,7 @@ from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
 )
-from services.lobby import jugador_conectado
+from services.lobby import jugador_conectado, escribir_chat
 from services.in_game import (
     tirar_dado,
     pasar_turno,
@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 class UnirseIn(BaseModel):
-    nombre_partida: str
+    id_partida: str
     apodo: str
 
 class PartidaIn(BaseModel):
@@ -181,6 +181,8 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     "to_broadcast": {"action": "", "data": ""},
                     "message_to": {"action": "", "data": "", "id_jugador": ""},
                 }
+                if entrada["action"] == "escribe_chat":
+                    respuesta = escribir_chat(jugador, entrada["mensage"])
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
                 if entrada["action"] == "mover_jugador":
@@ -225,7 +227,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         except WebSocketDisconnect:
             manager.disconnect(websocket)
             await manager.broadcast(
-                f"Desconectado",
+                "error_imp",
                 f"El jugador #{id_jugador} se fue de la partida",
                 partida.id_partida,
             )
