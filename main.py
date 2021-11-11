@@ -165,6 +165,12 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
             respuesta_inicial["personal_message"]["data"],
             websocket,
         )
+        respuesta_mostrar_cartas = mostrar_cartas(jugador)
+        await manager.send_personal_message(
+            respuesta_mostrar_cartas["personal_message"]["action"],
+            respuesta_mostrar_cartas["personal_message"]["data"],
+            websocket,
+        )
         try:
             while True:
                 entrada = await websocket.receive_json()
