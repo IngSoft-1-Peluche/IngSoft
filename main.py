@@ -23,18 +23,10 @@ from services.in_game import (
     acusar
 )
 
-async def global_execution_handler(request: Request, exc: Exception) -> ASGIApp:
-    return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content="Unknown Error",
-    )
+
 
 app = FastAPI()
 
-app.add_middleware(
-    ServerErrorMiddleware,
-    handler=global_execution_handler,
-)
 
 # Permisos para fetch de Front
 app.add_middleware(
