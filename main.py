@@ -9,6 +9,7 @@ from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
 )
+from services.lobby import jugador_conectado
 from services.in_game import (
     tirar_dado,
     pasar_turno,
@@ -163,6 +164,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
+        respuesta = jugador_conectado(jugador, partida)
         try:
             while True:
                 entrada = await websocket.receive_json()
