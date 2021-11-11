@@ -16,29 +16,27 @@ class Partida(db.Entity):
     cartas = pony.Set("Carta", reverse="partida")
     sobre = pony.Set("Carta", reverse="sobre")
 
-
     @pony.db_session()
     def cantidad_jugadores(self):
         return len(self.jugadores)
-    
+
     @pony.db_session()
     def monstruo_en_sobre(self):
         for carta in self.sobre:
             if carta.tipo == "M":
                 return carta
-    
+
     @pony.db_session()
     def victima_en_sobre(self):
         for carta in self.sobre:
             if carta.tipo == "V":
                 return carta
-    
+
     @pony.db_session()
     def recinto_en_sobre(self):
         for carta in self.sobre:
             if carta.tipo == "R":
                 return carta
-
 
 
 class Jugador(db.Entity):
@@ -105,6 +103,7 @@ def get_carta(id_carta):
 @pony.db_session()
 def crear_jugador(apodo):
     jugador = Jugador(apodo=apodo)
+    pony.commit()
     return jugador
 
 
@@ -112,5 +111,6 @@ def crear_jugador(apodo):
 def crear_partida(nombre, id_jugador):
     jugador = get_jugador(id_jugador)
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
+    pony.commit()
     jugador.asociar_a_partida(partida)
     return partida
