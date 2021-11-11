@@ -1,12 +1,7 @@
-from starlette.middleware.errors import ServerErrorMiddleware
-from starlette.requests import Request
-from starlette.types import ASGIApp
-
 from fastapi import FastAPI, status, HTTPException, WebSocket, WebSocketDisconnect
 import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 from models import db, crear_jugador, crear_partida, get_partida, get_jugador
 from my_sockets import ConnectionManager
@@ -20,9 +15,8 @@ from services.in_game import (
     mover_jugador,
     anunciar_sospecha,
     responder_sospecha,
-    acusar
+    acusar,
 )
-
 
 
 app = FastAPI()
@@ -170,7 +164,10 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
             while True:
                 entrada = await websocket.receive_json()
                 respuesta = {
-                    "personal_message": {"action": "error_imp", "data": "No existe esa accion"},
+                    "personal_message": {
+                        "action": "error_imp",
+                        "data": "No existe esa accion",
+                    },
                     "to_broadcast": {"action": "", "data": ""},
                     "message_to": {"action": "", "data": "", "id_jugador": ""},
                 }
@@ -196,7 +193,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         partida,
                         entrada["data"]["carta_monstruo"],
                         entrada["data"]["carta_victima"],
-                        entrada["data"]["carta_recinto"]
+                        entrada["data"]["carta_recinto"],
                     )
                 if entrada["action"] == "mostrar_cartas":
                     respuesta = mostrar_cartas(jugador)

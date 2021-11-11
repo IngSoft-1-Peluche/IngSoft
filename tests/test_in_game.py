@@ -160,7 +160,7 @@ def test_mover_jugador_vale():
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
     _ = tirar_dado(j2, mi_partida_de_2)
-    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)   
+    posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, posibles_casillas[0])
     assert (j2.posicion in posibles_casillas) == True
     assert respuesta["personal_message"]["action"] == "me_movi"
