@@ -31,6 +31,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+class UnirseIn(BaseModel):
+    nombre_partida: str
+    apodo: str
 
 class PartidaIn(BaseModel):
     nombre_partida: str
@@ -104,12 +107,13 @@ async def detalle_partida(id_partida: int):
         }
 
 
-@app.put("/partidas/{id_partida}", response_model=PartidaOut)
-async def unirse_a_partida(apodo: str, id_partida: int):
+@app.put("/partidas/", response_model=PartidaOut)
+async def unirse_a_partida(nuevo_usuario: UnirseIn):
     with pony.db_session:
-        partida = get_partida(id_partida)
+        nuevo_usuario_diccionario = nuevo_usuario.dict()
+        partida = get_partida(nuevo_usuario_diccionario["id_partida"])
         if len(partida.jugadores) < 6:
-            jugador = crear_jugador(apodo)
+            jugador = crear_jugador(nuevo_usuario_diccionario["apodo"])
             jugador.asociar_a_partida(partida)
         else:
             raise HTTPException(
@@ -152,33 +156,6 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
 # Toda la parte de WEBSockets
 
 manager = ConnectionManager()
-
-@app.websocket("/ws/{id_jugador}")
-async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
-    with pony.db_session:
-        jugador = get_jugador(id_jugador)
-        partida = jugador.partida
-        await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-        respuesta = {"personal_message": {"action": "prueba"}, "data":""}
-        await manager.send_personal_message(
-                    respuesta["personal_message"]["action"],
-                    respuesta["personal_message"]["data"],
-                    websocket,
-                )
-        try:
-            while True:
-                manager.send_personal_message(
-                    "spam",
-                    "spam",
-                    websocket,
-                )
-        except WebSocketDisconnect:
-            manager.disconnect(websocket)
-            await manager.broadcast(
-                f"Desconectado",
-                f"El jugador #{id_jugador} se fue de la partida",
-                partida.id_partida,
-            )
 
 @app.websocket("/ws/{id_jugador}")
 async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
