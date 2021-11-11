@@ -1,7 +1,12 @@
+from starlette.middleware.errors import ServerErrorMiddleware
+from starlette.requests import Request
+from starlette.types import ASGIApp
+
 from fastapi import FastAPI, status, HTTPException, WebSocket, WebSocketDisconnect
 import pony.orm as pony
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from models import db, crear_jugador, crear_partida, get_partida, get_jugador
 from my_sockets import ConnectionManager
@@ -18,7 +23,18 @@ from services.in_game import (
     acusar
 )
 
+async def global_execution_handler(request: Request, exc: Exception) -> ASGIApp:
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content="Unknown Error",
+    )
+
 app = FastAPI()
+
+app.add_middleware(
+    ServerErrorMiddleware,
+    handler=global_execution_handler,
+)
 
 # Permisos para fetch de Front
 app.add_middleware(

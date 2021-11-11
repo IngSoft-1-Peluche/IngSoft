@@ -105,6 +105,7 @@ def get_carta(id_carta):
 @pony.db_session()
 def crear_jugador(apodo):
     jugador = Jugador(apodo=apodo)
+    pony.commit()
     return jugador
 
 
@@ -112,5 +113,6 @@ def crear_jugador(apodo):
 def crear_partida(nombre, id_jugador):
     jugador = get_jugador(id_jugador)
     partida = Partida(nombre=nombre, creador=jugador.id_jugador)
+    pony.commit()
     jugador.asociar_a_partida(partida)
     return partida

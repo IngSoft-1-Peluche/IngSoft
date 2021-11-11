@@ -72,7 +72,7 @@ def test_pasar_turno():
     pony.commit()
     assert mi_partida_de_2.jugador_en_turno == 1
     assert respuesta["personal_message"]["action"] == ""
-    assert respuesta["personal_message"]["data"] == {}
+    assert respuesta["personal_message"]["data"] == ""
     assert respuesta["to_broadcast"]["action"] == "terminaron_turno"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j1.apodo
     assert respuesta["message_to"]["action"] == "tu_turno"
@@ -119,7 +119,7 @@ def test_tirar_dado_vale():
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert 0 < respuesta["to_broadcast"]["data"]["numero_dado"] < 7
     assert respuesta["message_to"]["action"] == ""
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 
@@ -139,9 +139,9 @@ def test_tirar_dado_no_vale():
     assert respuesta["personal_message"]["action"] == "error_imp"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
     assert respuesta["to_broadcast"]["action"] == ""
-    assert respuesta["to_broadcast"]["data"] == {}
+    assert respuesta["to_broadcast"]["data"] == ""
     assert respuesta["message_to"]["action"] == ""
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 
@@ -169,7 +169,7 @@ def test_mover_jugador_vale():
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert respuesta["to_broadcast"]["data"]["posicion_final"] == j2.posicion
     assert respuesta["message_to"]["action"] == ""
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 
@@ -192,9 +192,9 @@ def test_mover_jugador_no_turno():
     assert respuesta["personal_message"]["action"] == "error_imp"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
     assert respuesta["to_broadcast"]["action"] == ""
-    assert respuesta["to_broadcast"]["data"] == {}
+    assert respuesta["to_broadcast"]["data"] == ""
     assert respuesta["message_to"]["action"] == ""
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 
@@ -220,9 +220,9 @@ def test_mover_jugador_no_vale():
         respuesta["personal_message"]["data"]["message"] == "No es una posicion valida"
     )
     assert respuesta["to_broadcast"]["action"] == ""
-    assert respuesta["to_broadcast"]["data"] == {}
+    assert respuesta["to_broadcast"]["data"] == ""
     assert respuesta["message_to"]["action"] == ""
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
 
 
