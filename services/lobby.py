@@ -1,6 +1,5 @@
-from backend.services.start_game import iniciar_partida_service
 import pony.orm as pony
-from start_game import iniciar_partida_service
+from .start_game import iniciar_partida_service
 
 def jugador_conectado_lobby(jugador, partida):
     jugadores = []
@@ -25,7 +24,10 @@ def jugador_conectado_lobby(jugador, partida):
         "message_to": message_to,
     }
 
+@pony.db_session()
 def jugador_desconectado_lobby(jugador, partida):
+    partida.jugadores.pop[jugador]
+    pony.commit()
     jugadores = []
     for j in partida.jugadores:
         jugadores.append(j.apodo)
@@ -82,7 +84,7 @@ def iniciar_partida_lobby(jugador, partida):
             and jugador.id_jugador == partida.creador.id_jugador
         ):
             iniciar_partida_service(partida)
-            action2 = "inciada"
+            action2 = "iniciada"
             data2 = {}
         elif partida.iniciada == True:
             action1 = "error_imp"
