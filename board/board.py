@@ -1,5 +1,7 @@
 import numpy as np
 
+COLORES = ["red", "green", "blue", "yellow", "deepskyblue", "orange"]
+
 TIPOS_CASILLAS = {"C": "Casilla común", "R": "Recinto"}
 
 MATRIZ_TABLERO = np.genfromtxt("board/tablero.csv", delimiter=",")
@@ -31,6 +33,8 @@ RECINTOS = {
     72: "Salon",
     74: "Laboratorio"
 }
+
+PUERTAS = [2, 4, 16, 35, 50, 69, 83, 84]
 
 CARTAS = [
     ("Alcoba", "R"),
