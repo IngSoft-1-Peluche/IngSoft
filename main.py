@@ -9,7 +9,7 @@ from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
 )
-from services.lobby import jugador_conectado_lobby, jugador_desconectado_lobby, escribir_chat
+from services.lobby import jugador_conectado_lobby, jugador_desconectado_lobby, escribir_chat, iniciar_partida_lobby
 from services.in_game import (
     tirar_dado,
     pasar_turno,
@@ -181,6 +181,8 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     "to_broadcast": {"action": "", "data": ""},
                     "message_to": {"action": "", "data": "", "id_jugador": ""},
                 }
+                if entrada["action"] == "iniciar_partida":
+                    respuesta = iniciar_partida_lobby(jugador, partida)
                 if entrada["action"] == "escribe_chat":
                     respuesta = escribir_chat(jugador, entrada["mensage"])
                 if entrada["action"] == "tirar_dado":
