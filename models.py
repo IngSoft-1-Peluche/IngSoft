@@ -55,6 +55,10 @@ class Jugador(db.Entity):
         partida.jugadores.add(self)
 
     @pony.db_session()
+    def eliminar_de_partida(self, partida):
+        partida.jugadores.remove(self)
+
+    @pony.db_session()
     def cambiar_posicion(self, nueva_pos):
         self.posicion = nueva_pos
 

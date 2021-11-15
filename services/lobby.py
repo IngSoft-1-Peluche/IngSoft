@@ -1,5 +1,6 @@
 import pony.orm as pony
 from .start_game import iniciar_partida_service
+from models import Jugador
 
 def jugador_conectado_lobby(jugador, partida):
     jugadores = []
@@ -26,7 +27,7 @@ def jugador_conectado_lobby(jugador, partida):
 
 @pony.db_session()
 def jugador_desconectado_lobby(jugador, partida):
-    partida.jugadores.pop[jugador]
+    jugador.eliminar_de_partida(partida)
     pony.commit()
     jugadores = []
     for j in partida.jugadores:
