@@ -9,7 +9,7 @@ from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
 )
-from services.lobby import jugador_conectado, escribir_chat
+from services.lobby import jugador_conectado_lobby, jugador_desconectado_lobby, escribir_chat
 from services.in_game import (
     tirar_dado,
     pasar_turno,
@@ -164,7 +164,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-        conexion = jugador_conectado(jugador, partida)
+        conexion = jugador_conectado_lobby(jugador, partida)
         await manager.broadcast(
                     conexion["to_broadcast"]["action"],
                     conexion["to_broadcast"]["data"],
@@ -226,6 +226,12 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 )
         except WebSocketDisconnect:
             manager.disconnect(websocket)
+            respuesta = jugador_desconectado_lobby(jugador, partida)
+            await manager.broadcast(
+                    respuesta["to_broadcast"]["action"],
+                    respuesta["to_broadcast"]["data"],
+                    partida.id_partida,
+                )
             await manager.broadcast(
                 "error_imp",
                 f"El jugador #{id_jugador} se fue de la partida",
