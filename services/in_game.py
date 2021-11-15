@@ -16,7 +16,7 @@ def pasar_turno(partida):
     action3 = "tu_turno"
     data1 = ""
     data2 = {"nombre_jugador": jugador_siguiente.apodo}
-    data3 = ""
+    data3 = {}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
@@ -172,7 +172,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
                 "nombre_sospechador": jugador.apodo,
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
-            data3 = ""
+            data3 = {}
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -184,7 +184,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         action1 = "no_recinto"
         action2 = ""
         action3 = ""
-        data1 = {"message": "No estás en un recinto"}
+        data1 = {"message": "No estas en un recinto"}
         data2 = ""
         data3 = ""
         personal_message = {"action": action1, "data": data1}

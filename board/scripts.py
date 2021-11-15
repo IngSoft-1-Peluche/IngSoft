@@ -210,6 +210,9 @@ def generar_aristas_movimiento():
         (3, 26),
     ]
 
+    for i in range(1, 85):
+        aristas_movimiento.append((i, i))
+
     for i in range(16, 35):
         aristas_movimiento.append((i, i + 1))
 
@@ -243,9 +246,16 @@ matriz_adyacencia = generar_matriz_adyacencia(aristas_movimiento)
 
 np.savetxt("board/tablero.csv", matriz_tablero, fmt="%i", delimiter=",")
 
-np.savetxt("board/1mov.csv", matriz_adyacencia, fmt="%i", delimiter=",")
-np.savetxt("board/2mov.csv", matriz_adyacencia ** 2, fmt="%i", delimiter=",")
-np.savetxt("board/3mov.csv", matriz_adyacencia ** 3, fmt="%i", delimiter=",")
-np.savetxt("board/4mov.csv", matriz_adyacencia ** 4, fmt="%i", delimiter=",")
-np.savetxt("board/5mov.csv", matriz_adyacencia ** 5, fmt="%i", delimiter=",")
-np.savetxt("board/6mov.csv", matriz_adyacencia ** 6, fmt="%i", delimiter=",")
+mov_1 = matriz_adyacencia
+mov_2 = matriz_adyacencia ** 2 
+mov_3 = matriz_adyacencia ** 3 
+mov_4 = matriz_adyacencia ** 4 
+mov_5 = matriz_adyacencia ** 5 
+mov_6 = matriz_adyacencia ** 6 
+
+np.savetxt("board/1mov.csv", mov_1, fmt="%i", delimiter=",")
+np.savetxt("board/2mov.csv", mov_2, fmt="%i", delimiter=",")
+np.savetxt("board/3mov.csv", mov_3, fmt="%i", delimiter=",")
+np.savetxt("board/4mov.csv", mov_4, fmt="%i", delimiter=",")
+np.savetxt("board/5mov.csv", mov_5, fmt="%i", delimiter=",")
+np.savetxt("board/6mov.csv", mov_6, fmt="%i", delimiter=",")
