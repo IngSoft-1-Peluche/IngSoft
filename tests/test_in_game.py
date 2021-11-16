@@ -70,7 +70,8 @@ def test_pasar_turno():
     j1.orden_turno = 1
     j2.orden_turno = 2
     mi_partida_de_2.jugador_en_turno = 2
-    respuesta = pasar_turno(mi_partida_de_2)
+    j2.estado_turno = "F"
+    respuesta = pasar_turno(j2, mi_partida_de_2)
     pony.commit()
     assert mi_partida_de_2.jugador_en_turno == 1
     assert respuesta["personal_message"]["action"] == ""
@@ -81,6 +82,7 @@ def test_pasar_turno():
     assert respuesta["message_to"]["action"] == "tu_turno"
     assert respuesta["message_to"]["data"] == ""
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
+    assert j2.estado_turno == "N"
 
 
 @pony.db_session
@@ -112,6 +114,7 @@ def test_tirar_dado_vale():
     j2.posicion = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
+    j2.estado_turno = "D"
     respuesta = tirar_dado(j2, mi_partida_de_2)
 
     assert respuesta["personal_message"]["action"] == "tire_dado"
@@ -124,6 +127,7 @@ def test_tirar_dado_vale():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
+    assert j2.estado_turno == "M"
 
 
 @pony.db_session
@@ -138,6 +142,7 @@ def test_tirar_dado_no_vale():
     j2.orden_turno = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
+    estado_jugador = j1.estado_turno
     respuesta = tirar_dado(j1, mi_partida_de_2)
     assert respuesta["personal_message"]["action"] == "error_imp"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
@@ -146,6 +151,7 @@ def test_tirar_dado_no_vale():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
+    assert j1.estado_turno == estado_jugador
 
 
 @pony.db_session
@@ -162,6 +168,7 @@ def test_mover_jugador_vale():
     j2.posicion = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
+    j2.estado_turno = "D"
     _ = tirar_dado(j2, mi_partida_de_2)
     posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, posibles_casillas[0])
@@ -175,6 +182,7 @@ def test_mover_jugador_vale():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
+    assert j2.estado_turno == "SA"
 
 
 @pony.db_session
@@ -200,6 +208,7 @@ def test_mover_jugador_no_turno():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
+    assert j1.estado_turno == "N"
 
 
 @pony.db_session
@@ -216,6 +225,7 @@ def test_mover_jugador_no_vale():
     j2.posicion = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
+    j2.estado_turno = "D"
     _ = tirar_dado(j2, mi_partida_de_2)
     posibles_casillas = posiciones_posibles_a_mover(j2.posicion, j2.ultima_tirada)
     respuesta = mover_jugador(j2, 100)
@@ -228,6 +238,7 @@ def test_mover_jugador_no_vale():
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
+    assert j2.estado_turno == "M"
 
 
 @pony.db_session
@@ -250,9 +261,12 @@ def test_anunciar_sospecha_vale():
     j3.cartas.add(carta1)
     mi_partida_de_2.jugador_en_turno = 1
     pony.commit()
+    j1.estado_turno = "SA"
     respuesta = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     assert respuesta["message_to"]["action"] == "muestra"
     assert respuesta["message_to"]["id_jugador"] == j3.id_jugador
+    assert j1.estado_turno == "F"
+    assert j3.estado_turno == "MS"
 
 
 @pony.db_session
@@ -278,6 +292,7 @@ def test_anunciar_sospecha_no_turno():
     respuesta = anunciar_sospecha(j2, "carta_prueba_1", "carta_prueba_2")
     assert respuesta["personal_message"]["action"] == "error_imp"
     assert respuesta["personal_message"]["data"]["message"] == "No es tu turno"
+    assert j2.estado_turno == "N"
 
 
 @pony.db_session
@@ -300,6 +315,7 @@ def test_anunciar_sospecha_fail():
     j3.cartas.add(carta1)
     mi_partida_de_2.jugador_en_turno = 1
     pony.commit()
+    j1.estado_turno = "SA"
     respuesta = anunciar_sospecha(j1, "carta_prueba_3", "carta_prueba_2")
     assert respuesta["to_broadcast"]["action"] == "cartas_sospechadas_fail"
     assert respuesta["to_broadcast"]["data"]["nombre_sospechador"] == j1.apodo
@@ -308,6 +324,7 @@ def test_anunciar_sospecha_fail():
         "carta_prueba_3",
         "carta_prueba_2",
     ]
+    assert j1.estado_turno == "F"
 
 
 @pony.db_session
@@ -329,6 +346,7 @@ def test_responder_sospecha_vale():
     j2.posicion = 3
     j3.cartas.add(carta1)
     mi_partida_de_2.jugador_en_turno = 1
+    j1.estado_turno = "SA"
     _ = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     pony.commit()
     respuesta = responder_sospecha(j3, "carta_prueba_1")
@@ -336,6 +354,7 @@ def test_responder_sospecha_vale():
     assert respuesta["message_to"]["action"] == "carta_seleccionada"
     assert respuesta["message_to"]["data"]["carta_seleccionada"] == "carta_prueba_1"
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
+    assert j1.estado_turno == "F"
 
 
 @pony.db_session
@@ -357,8 +376,10 @@ def test_responder_sospecha_no_vale():
     j2.posicion = 3
     j3.cartas.add(carta1)
     mi_partida_de_2.jugador_en_turno = 1
+    j1.estado_turno = "SA"
     _ = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     pony.commit()
+    assert j3.estado_turno == "MS"
     respuesta = responder_sospecha(j3, "carta_prueba_2")
     pony.commit()
     assert respuesta["personal_message"]["action"] == "no_carta"
@@ -366,6 +387,7 @@ def test_responder_sospecha_no_vale():
         respuesta["personal_message"]["data"]["message"]
         == "No tienes esa carta para mostrar"
     )
+    assert j3.estado_turno == "N"
 
 
 @pony.db_session
@@ -390,5 +412,6 @@ def test_estado_jugadores():
         "color",
         "posicion",
         "orden",
+        "estado_turno",
         "en_turno",
     ]
