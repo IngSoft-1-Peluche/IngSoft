@@ -1,4 +1,5 @@
 import numpy as np
+from board import CASILLAS 
 
 matriz_tablero = np.matrix(
     [
@@ -226,6 +227,15 @@ def generar_aristas_movimiento():
         aristas_movimiento.append(
             (int(matriz_tablero[j, 13]), int(matriz_tablero[j + 1, 13]))
         )
+    
+    aranias = [k for k,v in CASILLAS.items() if v == 'A']
+    escorpìones = [k for k,v in CASILLAS.items() if v == 'E']
+    serpientes = [k for k,v in CASILLAS.items() if v == 'S']
+    murcielagos = [k for k,v in CASILLAS.items() if v == 'M']
+    aristas_movimiento.append((aranias[0], aranias[1]))
+    aristas_movimiento.append((escorpìones[0], escorpìones[1]))
+    aristas_movimiento.append((serpientes[0], serpientes[1]))
+    aristas_movimiento.append((murcielagos[0], murcielagos[1]))
 
     return aristas_movimiento
 
