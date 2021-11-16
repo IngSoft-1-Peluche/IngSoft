@@ -191,7 +191,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         jugador, entrada["data"]["nueva_posicion"]
                     )
                 if entrada["action"] == "terminar_turno":
-                    respuesta = pasar_turno(partida)
+                    respuesta = pasar_turno(jugador, partida)
                 if entrada["action"] == "sospechan":
                     respuesta = anunciar_sospecha(
                         jugador,
