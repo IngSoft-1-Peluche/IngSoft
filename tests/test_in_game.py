@@ -1,5 +1,7 @@
 import pony.orm as pony
+from services.start_game import iniciar_partida_service
 from services.in_game import (
+    estado_jugadores,
     numero_dado,
     siguiente_jugador,
     pasar_turno,
@@ -75,8 +77,9 @@ def test_pasar_turno():
     assert respuesta["personal_message"]["data"] == ""
     assert respuesta["to_broadcast"]["action"] == "terminaron_turno"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j1.apodo
+    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == "tu_turno"
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
 
 
@@ -168,6 +171,7 @@ def test_mover_jugador_vale():
     assert respuesta["to_broadcast"]["action"] == "se_movio"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert respuesta["to_broadcast"]["data"]["posicion_final"] == j2.posicion
+    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
@@ -362,3 +366,29 @@ def test_responder_sospecha_no_vale():
         respuesta["personal_message"]["data"]["message"]
         == "No tienes esa carta para mostrar"
     )
+
+
+@pony.db_session
+def test_estado_jugadores():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    pony.flush()
+    partida = db.Partida(nombre="Partida para estado jugadores", creador=j1)
+    j1.asociar_a_partida(partida)
+    j2.asociar_a_partida(partida)
+    j3.asociar_a_partida(partida)
+    iniciar_partida_service(partida)
+    pony.commit()
+
+    respuesta = estado_jugadores(partida)
+    assert respuesta["personal_message"]["action"] == "estado_jugadores"
+    assert len(respuesta["personal_message"]["data"]["lista_jugadores"]) == 3
+    assert list(respuesta["personal_message"]["data"]["lista_jugadores"][0].keys()) == [
+        "id_jugador",
+        "apodo",
+        "color",
+        "posicion",
+        "orden",
+        "en_turno",
+    ]
