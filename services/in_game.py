@@ -12,6 +12,7 @@ def numero_dado():
 
 def pasar_turno(partida):
     jugador_siguiente = siguiente_jugador(partida)
+    partida.jugador_en_turno = (partida.jugador_en_turno % len(partida.jugadores)) + 1
     action1 = ""
     action2 = "terminaron_turno"
     action3 = "tu_turno"
@@ -28,7 +29,6 @@ def pasar_turno(partida):
         "action": action3,
         "data": data3,
     }
-    partida.jugador_en_turno = (partida.jugador_en_turno % len(partida.jugadores)) + 1
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
