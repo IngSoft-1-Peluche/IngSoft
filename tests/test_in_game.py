@@ -79,7 +79,7 @@ def test_pasar_turno():
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j1.apodo
     assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == "tu_turno"
-    assert respuesta["message_to"]["data"] == {}
+    assert respuesta["message_to"]["data"] == ""
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
 
 
