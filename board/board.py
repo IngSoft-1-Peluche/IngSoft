@@ -10,6 +10,8 @@ TIPOS_CASILLAS = {
     "T": "Trampa"
 }
 
+COLORES = ["red", "green", "blue", "yellow", "deepskyblue", "orange"]
+
 MATRIZ_TABLERO = np.genfromtxt("board/tablero.csv", delimiter=",")
 
 MOVIMIENTOS = {
@@ -49,6 +51,8 @@ RECINTOS = {
     72: "Salon",
     74: "Laboratorio"
 }
+
+PUERTAS = [2, 4, 16, 35, 50, 69, 83, 84]
 
 CARTAS = [
     ("Alcoba", "R"),
