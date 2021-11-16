@@ -19,7 +19,9 @@ from services.in_game import (
     estado_jugadores,
 )
 
+
 app = FastAPI()
+
 
 # Permisos para fetch de Front
 app.add_middleware(
