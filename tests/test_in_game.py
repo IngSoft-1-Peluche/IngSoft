@@ -77,6 +77,7 @@ def test_pasar_turno():
     assert respuesta["personal_message"]["data"] == {}
     assert respuesta["to_broadcast"]["action"] == "terminaron_turno"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j1.apodo
+    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == "tu_turno"
     assert respuesta["message_to"]["data"] == {}
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
@@ -170,6 +171,7 @@ def test_mover_jugador_vale():
     assert respuesta["to_broadcast"]["action"] == "se_movio"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert respuesta["to_broadcast"]["data"]["posicion_final"] == j2.posicion
+    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == {}
     assert type(respuesta["message_to"]["id_jugador"]) == int
