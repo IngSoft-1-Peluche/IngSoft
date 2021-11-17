@@ -1,6 +1,14 @@
 import pony.orm as pony
 from fastapi import HTTPException
-import random
+
+ESTADOS_TURNO_JUGADOR = {
+    "N": "No tiene turno",
+    "D": "Tirar Dado",
+    "M": "Mover",
+    "SA": "Sospechar/Acusar",
+    "F": "Fin de turno",
+    "MS": "Mostrar sospecha"
+}
 
 db = pony.Database()
 
@@ -49,6 +57,8 @@ class Jugador(db.Entity):
     ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
     sospecha = pony.Optional("Partida", reverse="jugador_que_sospecha")
+    color = pony.Optional(str)
+    estado_turno = pony.Optional(str, default="N")
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
