@@ -173,25 +173,27 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-
-        respuesta_inicial = estado_jugadores(partida)
-        await manager.send_personal_message(
-            respuesta_inicial["personal_message"]["action"],
-            respuesta_inicial["personal_message"]["data"],
-            websocket,
-        )
-        respuesta_mostrar_cartas = mostrar_cartas(jugador)
-        await manager.send_personal_message(
-            respuesta_mostrar_cartas["personal_message"]["action"],
-            respuesta_mostrar_cartas["personal_message"]["data"],
-            websocket,
-        )
-        conexion = jugador_conectado_lobby(jugador, partida)
-        await manager.broadcast(
-            conexion["to_broadcast"]["action"],
-            conexion["to_broadcast"]["data"],
-            partida.id_partida,
-        )
+        if (partida.inciada == True):
+            respuesta_inicial = estado_jugadores(partida)
+            await manager.send_personal_message(
+                respuesta_inicial["personal_message"]["action"],
+                respuesta_inicial["personal_message"]["data"],
+                websocket,
+            )
+            respuesta_mostrar_cartas = mostrar_cartas(jugador)
+            await manager.send_personal_message(
+                respuesta_mostrar_cartas["personal_message"]["action"],
+                respuesta_mostrar_cartas["personal_message"]["data"],
+                websocket,
+            )
+        
+        else: 
+            conexion = jugador_conectado_lobby(jugador, partida)
+            await manager.broadcast(
+                conexion["to_broadcast"]["action"],
+                conexion["to_broadcast"]["data"],
+                partida.id_partida,
+            )
         try:
             while True:
                 entrada = await websocket.receive_json()
@@ -222,7 +224,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         entrada["data"]["carta_victima"],
                     )
                 if entrada["action"] == "respuesta_sospecha":
-                    respuesta = responder_sospecha(jugador, entrada["data"]["carta"])
+                    respuesta = responder_sospecha(jugador, entrada["data"])
                 if entrada["action"] == "acusar":
                     respuesta = acusar(
                         jugador,
