@@ -173,7 +173,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-        if (partida.inciada == True):
+        if (partida.iniciada == True):
             respuesta_inicial = estado_jugadores(partida)
             await manager.send_personal_message(
                 respuesta_inicial["personal_message"]["action"],
