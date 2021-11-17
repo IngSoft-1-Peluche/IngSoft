@@ -24,6 +24,8 @@ def asignar_orden_aleatorio(partida):
     i = 1
     for jugador in jugadores:
         jugador.orden_turno = i
+        if i == 1:
+            jugador.estado_turno = "D"
         i += 1
     return jugadores
 
@@ -50,19 +52,6 @@ def asignar_colores(partida):
 
 def tirar_dado():
     return random.randint(1, 6)
-
-
-@pony.db_session()
-def pasar_turno(partida):
-    jugadores = partida.jugadores
-    partida.jugador_en_turno = (partida.jugador_en_turno % len(jugadores)) + 1
-
-
-def jugador_esta_en_turno(jugador, partida):
-    if jugador.orden_turno == partida.jugador_en_turno:
-        return True
-    else:
-        return False
 
 
 @pony.db_session()
