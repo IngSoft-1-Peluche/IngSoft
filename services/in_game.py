@@ -12,8 +12,8 @@ def numero_dado():
 
 def pasar_turno(jugador, partida):
     if jugador.estado_turno == "F" or jugador.estado_turno == "SA":
-        jugador_siguiente = siguiente_jugador(partida)
-        partida.jugador_en_turno = (partida.jugador_en_turno % len(partida.jugadores)) + 1
+        jugador_siguiente = partida.siguiente_jugador()
+        partida.pasar_turno()
         jugador.estado_turno = "N"
         jugador_siguiente.estado_turno = "D"
         action1 = ""
@@ -43,15 +43,6 @@ def pasar_turno(jugador, partida):
         "to_broadcast": to_broadcast,
         "message_to": message_to,
     }
-
-
-def siguiente_jugador(partida):
-    siguiente = (partida.jugador_en_turno % len(partida.jugadores)) + 1
-    jugadores = partida.jugadores
-    for j in jugadores:
-        if j.orden_turno == siguiente:
-            jugador_siguiente = j
-    return jugador_siguiente
 
 
 def jugador_esta_en_turno(jugador, partida):
@@ -301,6 +292,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             partida, [carta_monstruo, carta_victima, carta_recinto]
         )
         jugador.estado_turno = "F"
+        jugador.acuso = True
         if gano:
             respuesta_personal["data"] = {"message": "ganaste"}
             respuesta_broadcast["data"] = {

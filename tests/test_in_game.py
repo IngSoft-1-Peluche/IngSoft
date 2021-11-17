@@ -3,7 +3,6 @@ from services.start_game import iniciar_partida_service
 from services.in_game import (
     estado_jugadores,
     numero_dado,
-    siguiente_jugador,
     pasar_turno,
     jugador_esta_en_turno,
     tirar_dado,
@@ -27,7 +26,7 @@ def test_siguiente_jugador_de_a_2():
     j2.orden_turno = 2
     mi_partida_de_2.jugador_en_turno = 2
     pony.commit()
-    jugador_siguiente = siguiente_jugador(mi_partida_de_2)
+    jugador_siguiente = mi_partida_de_2.siguiente_jugador()
     assert jugador_siguiente == j1
 
 
@@ -55,7 +54,7 @@ def test_siguiente_jugador_de_a_6():
     j6.orden_turno = 6
     mi_partida_de_6.jugador_en_turno = 6
     pony.commit()
-    jugador_siguiente = siguiente_jugador(mi_partida_de_6)
+    jugador_siguiente = mi_partida_de_6.siguiente_jugador()
     assert jugador_siguiente == j1
 
 

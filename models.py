@@ -45,6 +45,14 @@ class Partida(db.Entity):
         for carta in self.sobre:
             if carta.tipo == "R":
                 return carta
+    
+    @pony.db_session()
+    def siguiente_jugador(self):
+        return siguiente_jugador(self)
+
+    @pony.db_session()
+    def pasar_turno(self):
+        self.jugador_en_turno = self.siguiente_jugador().orden_turno
 
 
 class Jugador(db.Entity):
@@ -59,6 +67,7 @@ class Jugador(db.Entity):
     sospecha = pony.Optional("Partida", reverse="jugador_que_sospecha")
     color = pony.Optional(str)
     estado_turno = pony.Optional(str, default="N")
+    acuso = pony.Required(bool, default=False)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
@@ -128,3 +137,14 @@ def crear_partida(nombre, id_jugador):
     pony.commit()
     jugador.asociar_a_partida(partida)
     return partida
+
+@pony.db_session()
+def siguiente_jugador(partida):
+    t = True
+    i = 1
+    while t:
+        siguiente = (partida.jugador_en_turno + i) % len(partida.jugadores)
+        jugador_siguiente = partida.jugadores.filter(orden_turno= siguiente).first()
+        t = jugador_siguiente.acuso
+        i += 1
+    return jugador_siguiente
