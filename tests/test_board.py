@@ -50,3 +50,23 @@ def test_posiciones_iniciales():
     for jugador in p1.jugadores:
         assert jugador.color in COLORES
 
+
+@pony.db_session
+def test_estado_turno_front():
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    j3 = db.Jugador(apodo="pedro")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida para estado turno", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    j3.partida = p1
+    j1.estado_turno = "SA"
+    j1.posicion = 39
+    j2.estado_turno = "N"
+    pony.commit()
+
+    assert j1.estado_turno_front() == "SA"
+    assert j2.estado_turno_front() == "N"
+    j1.posicion = 40
+    assert j1.estado_turno_front() == "A"
