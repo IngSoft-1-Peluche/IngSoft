@@ -300,7 +300,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
         gano = comprobar_cartas_sobre(
             partida, [carta_monstruo, carta_victima, carta_recinto]
         )
-        jugador.estado_turno = "F"
+        jugador.estado_turno = "N"
         if gano:
             respuesta_personal["data"] = {"message": "ganaste"}
             respuesta_broadcast["data"] = {
@@ -319,9 +319,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
-                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
-                    "nombre_jugador"
-                ],
+                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"]["nombre_jugador"],
                 "monstruo_acusado": carta_monstruo,
                 "victima_acusado": carta_victima,
                 "recinto_acusado": carta_recinto,
