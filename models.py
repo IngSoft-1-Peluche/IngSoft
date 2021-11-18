@@ -1,6 +1,8 @@
 import pony.orm as pony
 from fastapi import HTTPException
 
+from board.board import TRAMPAS
+
 ESTADOS_TURNO_JUGADOR = {
     "N": "No tiene turno",
     "D": "Tirar Dado",
@@ -47,19 +49,23 @@ class Partida(db.Entity):
                 return carta
     
     @pony.db_session()
-    def siguiente_jugador(self):
+    def siguiente_jugador(self, pasar_turno=False):
         t = True
-        i = 1
+        i = 0
         while t:
-            siguiente = (self.jugador_en_turno + i) % len(self.jugadores)
+            siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
+            print(siguiente)
+            print(list(filter(lambda j: j.orden_turno == siguiente, self.jugadores)))
             jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
-            t = jugador_siguiente.acuso
+            t = jugador_siguiente.acuso or jugador_siguiente.en_trampa
+            if pasar_turno:
+                jugador_siguiente.en_trampa = False
             i += 1
         return jugador_siguiente
 
     @pony.db_session()
     def pasar_turno(self):
-        self.jugador_en_turno = self.siguiente_jugador().orden_turno
+        self.jugador_en_turno = self.siguiente_jugador(pasar_turno=True).orden_turno
 
 
 class Jugador(db.Entity):
@@ -75,6 +81,7 @@ class Jugador(db.Entity):
     color = pony.Optional(str)
     estado_turno = pony.Optional(str, default="N")
     acuso = pony.Required(bool, default=False)
+    en_trampa = pony.Required(bool, default=False)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
@@ -87,6 +94,9 @@ class Jugador(db.Entity):
     @pony.db_session()
     def cambiar_posicion(self, nueva_pos):
         self.posicion = nueva_pos
+        if nueva_pos in TRAMPAS:
+            self.en_trampa = True
+
 
 
 class Carta(db.Entity):
