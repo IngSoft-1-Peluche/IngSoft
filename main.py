@@ -240,6 +240,12 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta["message_to"]["data"],
                     respuesta["message_to"]["id_jugador"],
                 )
+                respuesta_inicial = estado_jugadores(partida)
+                await manager.send_personal_message(
+                    respuesta_inicial["personal_message"]["action"],
+                    respuesta_inicial["personal_message"]["data"],
+                    websocket,
+                )
         except WebSocketDisconnect:
             manager.disconnect(websocket)
             respuesta = jugador_desconectado_lobby(jugador, partida)
