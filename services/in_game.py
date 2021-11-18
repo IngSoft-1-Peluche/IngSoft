@@ -368,7 +368,7 @@ def estado_jugadores(partida):
 @pony.db_session()
 def lista_estado_jugadores(partida):
     lista = []
-    for jugador in partida.jugadores:
+    for jugador in partida.jugadores.order_by(db.Jugador.orden_turno):
         lista.append(
             {
                 "id_jugador": jugador.id_jugador,
@@ -376,7 +376,7 @@ def lista_estado_jugadores(partida):
                 "color": jugador.color,
                 "posicion": jugador.posicion,
                 "orden": jugador.orden_turno,
-                "estado_turno": jugador.estado_turno,
+                "estado_turno": jugador.estado_turno_front(),
                 "en_turno": jugador.orden_turno == partida.jugador_en_turno,
             }
         )

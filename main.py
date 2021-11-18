@@ -214,7 +214,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         entrada["data"]["carta_victima"],
                     )
                 if entrada["action"] == "respuesta_sospecha":
-                    respuesta = responder_sospecha(jugador, entrada["data"]["carta"])
+                    respuesta = responder_sospecha(jugador, entrada["data"])
                 if entrada["action"] == "acusar":
                     respuesta = acusar(
                         jugador,

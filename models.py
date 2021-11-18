@@ -1,6 +1,8 @@
 import pony.orm as pony
 from fastapi import HTTPException
 
+from board.board import RECINTOS
+
 ESTADOS_TURNO_JUGADOR = {
     "N": "No tiene turno",
     "D": "Tirar Dado",
@@ -71,6 +73,15 @@ class Jugador(db.Entity):
     @pony.db_session()
     def cambiar_posicion(self, nueva_pos):
         self.posicion = nueva_pos
+
+    @pony.db_session()
+    def estado_turno_front(self):
+        if self.estado_turno == "SA" and self.posicion in RECINTOS.keys():
+            return self.estado_turno
+        elif self.estado_turno == "SA" and self.posicion not in RECINTOS.keys():
+            return "A"
+        else:
+            return self.estado_turno
 
 
 class Carta(db.Entity):
