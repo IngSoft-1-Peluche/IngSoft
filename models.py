@@ -48,7 +48,14 @@ class Partida(db.Entity):
     
     @pony.db_session()
     def siguiente_jugador(self):
-        return siguiente_jugador(self)
+        t = True
+        i = 1
+        while t:
+            siguiente = (self.jugador_en_turno + i) % len(self.jugadores)
+            jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
+            t = jugador_siguiente.acuso
+            i += 1
+        return jugador_siguiente
 
     @pony.db_session()
     def pasar_turno(self):
@@ -137,14 +144,3 @@ def crear_partida(nombre, id_jugador):
     pony.commit()
     jugador.asociar_a_partida(partida)
     return partida
-
-@pony.db_session()
-def siguiente_jugador(partida):
-    t = True
-    i = 1
-    while t:
-        siguiente = (partida.jugador_en_turno + i) % len(partida.jugadores)
-        jugador_siguiente = partida.jugadores.filter(orden_turno= siguiente).first()
-        t = jugador_siguiente.acuso
-        i += 1
-    return jugador_siguiente

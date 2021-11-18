@@ -59,6 +59,36 @@ def test_siguiente_jugador_de_a_6():
 
 
 @pony.db_session
+def test_siguiente_jugador_salteando():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    j3 = db.Jugador(apodo="j3")
+    j4 = db.Jugador(apodo="j4")
+    j5 = db.Jugador(apodo="j5")
+    j6 = db.Jugador(apodo="j6")
+    pony.flush()
+    mi_partida_de_6 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_6)
+    j2.asociar_a_partida(mi_partida_de_6)
+    j3.asociar_a_partida(mi_partida_de_6)
+    j4.asociar_a_partida(mi_partida_de_6)
+    j5.asociar_a_partida(mi_partida_de_6)
+    j6.asociar_a_partida(mi_partida_de_6)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j3.orden_turno = 3
+    j4.orden_turno = 4
+    j5.orden_turno = 5
+    j6.orden_turno = 6
+    mi_partida_de_6.jugador_en_turno = 6
+    j1.acuso = True
+    j2.acuso = True
+    pony.commit()
+    jugador_siguiente = mi_partida_de_6.siguiente_jugador()
+    assert jugador_siguiente == j3
+
+
+@pony.db_session
 def test_pasar_turno():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
