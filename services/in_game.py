@@ -300,6 +300,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
                 "victima_en_sobre": carta_victima,
                 "recinto_en_sobre": carta_recinto,
             }
+            jugador.ganador = True
         else:
             respuesta_pasar_turno = pasar_turno(jugador, partida)
             respuesta_personal["data"] = {
