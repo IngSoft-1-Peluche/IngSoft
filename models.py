@@ -61,6 +61,9 @@ class Partida(db.Entity):
     def pasar_turno(self):
         self.jugador_en_turno = self.siguiente_jugador().orden_turno
 
+    @pony.db_session()
+    def esta_terminada(self):
+        return any([j.ganador for j in self.jugadores])
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
@@ -75,6 +78,7 @@ class Jugador(db.Entity):
     color = pony.Optional(str)
     estado_turno = pony.Optional(str, default="N")
     acuso = pony.Required(bool, default=False)
+    ganador = pony.Required(bool, default=False)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
