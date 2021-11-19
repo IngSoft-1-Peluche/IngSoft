@@ -37,9 +37,12 @@ def test_acusar():
             jugador_no_turno = j
     respuesta_no_turno = acusar(jugador_no_turno, p1, carta_monstruo, carta_victima, carta_recinto)
     assert jugador_no_turno.estado_turno == "N"
+    assert p1.esta_terminada() == False
     respuesta_correcta = acusar(jugador_turno, p1, carta_monstruo, carta_victima, carta_recinto)
     assert jugador_turno.estado_turno == "N"
     assert jugador_turno.acuso == True
+    assert jugador_turno.ganador == True
+    assert p1.esta_terminada() == True
     jugador_turno.estado_turno = "SA"
     jugador_turno.acuso = False
     respuesta_incorrecta = acusar(jugador_turno, p1, carta_monstruo, carta_victima, recinto_incorrecto)
