@@ -1,3 +1,7 @@
+import os
+if os.path.exists("database.sqlite"):
+    os.remove("database.sqlite")
+
 from fastapi.testclient import TestClient
 import pony.orm as pony
 from fastapi import status
@@ -73,7 +77,7 @@ def test_post_crear_partida():
 
 @pony.db_session
 def test_detalle_partida_endpoint():
-    partida = db.Partida.select()[:1][0]
+    partida = db.Partida.select().first()
     response = client.get("/partidas/%s" % partida.id_partida)
     partida_json = response.json()
 
