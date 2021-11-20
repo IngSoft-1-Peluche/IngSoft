@@ -193,6 +193,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data1 = ""
             data2 = {
                 "nombre_sospechador": jugador.apodo,
+                "nombre_sospechoso": jugador_que_muestra.apodo, 
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
             data3 = {}
@@ -256,6 +257,8 @@ def responder_sospecha(jugador, carta):
         if carta in cartas:
             action1 = "muestra_carta"
             data1 = {}
+            action2 = "sospecha_respondida"
+            data2 = {"nombre_jugador": jugador.apodo}
             action3 = "carta_seleccionada"
             data3 = {"carta_seleccionada": carta}
         personal_message = {"action": action1, "data": data1}
@@ -300,6 +303,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
                 "victima_en_sobre": carta_victima,
                 "recinto_en_sobre": carta_recinto,
             }
+            jugador.ganador = True
         else:
             respuesta_pasar_turno = pasar_turno(jugador, partida)
             respuesta_personal["data"] = {
@@ -310,6 +314,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
+                "lista_jugadores": lista_estado_jugadores(partida),
                 "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
                     "nombre_jugador"
                 ],
