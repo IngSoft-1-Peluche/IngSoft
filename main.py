@@ -9,7 +9,12 @@ from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
 )
-from services.lobby import jugador_conectado_lobby, jugador_desconectado_lobby, escribir_chat, iniciar_partida_lobby
+from services.lobby import (
+    jugador_conectado_lobby,
+    jugador_desconectado_lobby,
+    escribir_chat,
+    iniciar_partida_lobby,
+)
 from services.in_game import (
     tirar_dado,
     pasar_turno,
@@ -33,9 +38,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class UnirseIn(BaseModel):
     id_partida: str
     apodo: str
+
 
 class PartidaIn(BaseModel):
     nombre_partida: str
@@ -159,31 +166,34 @@ async def iniciar_partida(id_jugador: int, id_partida: int):
 
 manager = ConnectionManager()
 
+
 @app.websocket("/ws/{id_jugador}")
 async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
     with pony.db_session:
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-
-        respuesta_inicial = estado_jugadores(partida)
-        await manager.send_personal_message(
-            respuesta_inicial["personal_message"]["action"],
-            respuesta_inicial["personal_message"]["data"],
-            websocket,
-        )
-        respuesta_mostrar_cartas = mostrar_cartas(jugador)
-        await manager.send_personal_message(
-            respuesta_mostrar_cartas["personal_message"]["action"],
-            respuesta_mostrar_cartas["personal_message"]["data"],
-            websocket,
-        )
-        conexion = jugador_conectado_lobby(jugador, partida)
-        await manager.broadcast(
-                    conexion["to_broadcast"]["action"],
-                    conexion["to_broadcast"]["data"],
-                    partida.id_partida,
-                )
+        if (partida.iniciada == True):
+            respuesta_inicial = estado_jugadores(partida)
+            await manager.send_personal_message(
+                respuesta_inicial["personal_message"]["action"],
+                respuesta_inicial["personal_message"]["data"],
+                websocket,
+            )
+            respuesta_mostrar_cartas = mostrar_cartas(jugador)
+            await manager.send_personal_message(
+                respuesta_mostrar_cartas["personal_message"]["action"],
+                respuesta_mostrar_cartas["personal_message"]["data"],
+                websocket,
+            )
+        
+        else: 
+            conexion = jugador_conectado_lobby(jugador, partida)
+            await manager.broadcast(
+                conexion["to_broadcast"]["action"],
+                conexion["to_broadcast"]["data"],
+                partida.id_partida,
+            )
         try:
             while True:
                 entrada = await websocket.receive_json()
@@ -214,7 +224,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                         entrada["data"]["carta_victima"],
                     )
                 if entrada["action"] == "respuesta_sospecha":
-                    respuesta = responder_sospecha(jugador, entrada["data"]["carta"])
+                    respuesta = responder_sospecha(jugador, entrada["data"])
                 if entrada["action"] == "acusar":
                     respuesta = acusar(
                         jugador,
@@ -244,10 +254,10 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
             manager.disconnect(websocket)
             respuesta = jugador_desconectado_lobby(jugador, partida)
             await manager.broadcast(
-                    respuesta["to_broadcast"]["action"],
-                    respuesta["to_broadcast"]["data"],
-                    partida.id_partida,
-                )
+                respuesta["to_broadcast"]["action"],
+                respuesta["to_broadcast"]["data"],
+                partida.id_partida,
+            )
             await manager.broadcast(
                 "error_imp",
                 f"El jugador #{id_jugador} se fue de la partida",
