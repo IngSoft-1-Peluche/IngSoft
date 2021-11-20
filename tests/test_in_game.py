@@ -271,6 +271,31 @@ def test_mover_jugador_no_vale():
 
 
 @pony.db_session
+def test_mover_a_trampa():
+    j1 = db.Jugador(apodo="j1")
+    j2 = db.Jugador(apodo="j2")
+    pony.flush()
+    mi_partida_de_2 = db.Partida(nombre="mi_partida", creador=j1.id_jugador)
+    j1.asociar_a_partida(mi_partida_de_2)
+    j2.asociar_a_partida(mi_partida_de_2)
+    j1.orden_turno = 1
+    j2.orden_turno = 2
+    j1.posicion = 2
+    j2.posicion = 2
+    mi_partida_de_2.jugador_en_turno = 2
+    pony.commit()
+    j2.estado_turno = "M"
+    j2.ultima_tirada = 6
+    _ = mover_jugador(j2, 22)
+    assert j2.en_trampa == True
+    assert mi_partida_de_2.siguiente_jugador() == j1
+    mi_partida_de_2.pasar_turno()
+    assert mi_partida_de_2.siguiente_jugador() == j1
+    mi_partida_de_2.pasar_turno()
+    assert mi_partida_de_2.siguiente_jugador() == j2
+
+
+@pony.db_session
 def test_anunciar_sospecha_vale():
     j1 = db.Jugador(apodo="j1")
     j2 = db.Jugador(apodo="j2")
