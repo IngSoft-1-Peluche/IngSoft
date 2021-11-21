@@ -111,7 +111,6 @@ def mover_jugador(jugador, nueva_posicion):
         data2 = {
             "nombre_jugador": jugador.apodo,
             "posicion_final": nueva_posicion,
-            "lista_jugadores": lista_estado_jugadores(partida),
         }
         data3 = ""
         personal_message = {"action": action1, "data": data1}
@@ -315,7 +314,6 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
-                "lista_jugadores": lista_estado_jugadores(partida),
                 "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
                     "nombre_jugador"
                 ],
