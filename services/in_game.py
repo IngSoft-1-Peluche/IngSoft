@@ -121,7 +121,7 @@ def mover_jugador(jugador, nueva_posicion):
         data4 = ""
         if nueva_posicion in TRAMPAS:
             action4 = "mensaje_sistema"
-            data4 =  {"message": f"El jugador {jugador.apodo} cayó en una trampa, pierde un turno."}
+            data4 =  {"message": f"El jugador {jugador.apodo} cayo en una trampa, pierde un turno."}
             jugador.estado_turno = "F"
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
@@ -350,7 +350,10 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
                 "recinto_acusado": carta_recinto,
             }
             respuesta_to = respuesta_pasar_turno["message_to"]
-            respuesta_sistema["data"] = {"message": f"El jugador {jugador.apodo} eligio las cartas {carta_recinto}, {carta_monstruo} y {carta_victima} para la acusacion pero no acerto. {jugador.apodo} se queda fuera!"}
+            message = f"El jugador {jugador.apodo} eligio las cartas {carta_recinto}, {carta_monstruo} y {carta_victima} para la acusacion pero no acerto. {jugador.apodo} se queda fuera!"
+            if all([j.acuso for j in partida.jugadores]):
+                message += " Todos los jugadores erraron la acusacion! Todos pierden."
+            respuesta_sistema["data"] = {"message": message}
         jugador.estado_turno = "N"
         jugador.acuso = True
     elif jugador.orden_turno != partida.jugador_en_turno:
