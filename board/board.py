@@ -10,6 +10,8 @@ TIPOS_CASILLAS = {
     "T": "Trampa"
 }
 
+TRAMPAS = [22, 29, 56, 63]
+
 COLORES = ["red", "green", "blue", "yellow", "deepskyblue", "orange"]
 
 MATRIZ_TABLERO = np.genfromtxt("board/tablero.csv", delimiter=",")
@@ -39,6 +41,11 @@ CASILLAS[54] = "A"
 CASILLAS[65] = "A"
 CASILLAS[71] = "M"
 CASILLAS[73] = "E"
+
+CASILLAS[22] = "T"
+CASILLAS[29] = "T"
+CASILLAS[56] = "T"
+CASILLAS[63] = "T"
 
 
 RECINTOS = {
