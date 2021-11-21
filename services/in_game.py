@@ -57,6 +57,7 @@ def tirar_dado(jugador, partida):
         action1 = "tire_dado"
         action2 = "tiraron_dado"
         action3 = ""
+        action4 = "mensaje_sistema"
         dado = numero_dado()
         jugador.ultima_tirada = dado
         casillas_a_mover = posiciones_posibles_a_mover(jugador.posicion, dado)
@@ -66,12 +67,14 @@ def tirar_dado(jugador, partida):
 
         data2 = {"nombre_jugador": jugador.apodo, "numero_dado": dado}
         data3 = ""
+        data4 = {"message": f"El jugador {jugador.apodo} tiro el dado y obtuvo un {dado}"}
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
+        system = {"action": action4, "data": data4}
     elif jugador_esta_en_turno(jugador, partida) and jugador.estado_turno != "D":
         action1 = "error_imp"
-        data1 = {"message": "Ya estas en la etapa de tirar el dado"}
+        data1 = {"message": "Ya no estas en la etapa de tirar el dado"}
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": "", "data": ""}
         message_to = {"action": "", "data": "", "id_jugador": -1}
@@ -89,6 +92,7 @@ def tirar_dado(jugador, partida):
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 

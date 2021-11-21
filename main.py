@@ -208,7 +208,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 if entrada["action"] == "iniciar_partida":
                     respuesta = iniciar_partida_lobby(jugador, partida)
                 if entrada["action"] == "escribe_chat":
-                    respuesta = escribir_chat(jugador, entrada["mensage"])
+                    respuesta = escribir_chat(jugador, entrada["data"]["message"])
                 if entrada["action"] == "tirar_dado":
                     respuesta = tirar_dado(jugador, partida)
                 if entrada["action"] == "mover_jugador":
@@ -249,6 +249,11 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta["message_to"]["action"],
                     respuesta["message_to"]["data"],
                     respuesta["message_to"]["id_jugador"],
+                )
+                await manager.broadcast_system(
+                    respuesta["system"]["action"],
+                    respuesta["system"]["data"],
+                    partida.id_partida,
                 )
         except WebSocketDisconnect:
             manager.disconnect(websocket)

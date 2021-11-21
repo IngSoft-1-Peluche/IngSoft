@@ -64,13 +64,15 @@ def jugador_desconectado_lobby(jugador, partida):
     }
 
 
-def escribir_chat(jugador, mensage):
+def escribir_chat(jugador, message):
     action1 = ""
     action2 = "escribio_chat"
     action3 = ""
+    action4 = ""
     data1 = ""
-    data2 = {"nombre_jugador": jugador.apodo, "message": mensage}
+    data2 = {"nombre_jugador": jugador.apodo, "message": message}
     data3 = ""
+    data4 = ""
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
@@ -78,10 +80,12 @@ def escribir_chat(jugador, mensage):
         "data": data3,
         "id_jugador": -1,
     }
+    system = {"action": action4, "data": data4}
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 
@@ -90,9 +94,11 @@ def iniciar_partida_lobby(jugador, partida):
         action1 = ""
         action2 = ""
         action3 = ""
+        action4 = ""
         data1 = ""
         data2 = ""
         data3 = ""
+        data4 = ""
         if (
             partida.iniciada == False
             and 1 < len(partida.jugadores) < 7
@@ -119,8 +125,10 @@ def iniciar_partida_lobby(jugador, partida):
             "data": data3,
             "id_jugador": -1,
         }
+        system = {"action": action4, "data": data4}
         return {
             "personal_message": personal_message,
             "to_broadcast": to_broadcast,
             "message_to": message_to,
+            "system": system,
         }
