@@ -121,7 +121,7 @@ def mover_jugador(jugador, nueva_posicion):
         data4 = ""
         if nueva_posicion in TRAMPAS:
             action4 = "mensaje_sistema"
-            data4 =  {"message": f"El jugador {jugador.apodo} cayó en una trampa, pierde un turno."}
+            data4 =  {"message": f"El jugador {jugador.apodo} cayo en una trampa, pierde un turno."}
             jugador.estado_turno = "F"
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
