@@ -55,6 +55,27 @@ def test_posiciones_iniciales():
 
 
 @pony.db_session
+def test_estado_turno_front():
+    j1 = db.Jugador(apodo="juan")
+    j2 = db.Jugador(apodo="maria")
+    j3 = db.Jugador(apodo="pedro")
+    pony.flush()
+    p1 = db.Partida(nombre="Partida para estado turno", iniciada=False, creador=j1)
+    j1.partida = p1
+    j2.partida = p1
+    j3.partida = p1
+    j1.estado_turno = "SA"
+    j1.posicion = 39
+    j2.estado_turno = "N"
+    pony.commit()
+
+    assert j1.estado_turno_front() == "SA"
+    assert j2.estado_turno_front() == "N"
+    j1.posicion = 40
+    assert j1.estado_turno_front() == "A"
+
+
+@pony.db_session
 def test_pasaje_de_turno_trampa():
     j1 = db.Jugador(apodo="juan")
     j2 = db.Jugador(apodo="maria")
@@ -74,3 +95,4 @@ def test_pasaje_de_turno_trampa():
     assert siguiente_jugador == j3
     p1.pasar_turno()
     assert p1.jugador_en_turno == j3.orden_turno
+

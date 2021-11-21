@@ -207,7 +207,6 @@ def test_mover_jugador_vale():
     assert respuesta["to_broadcast"]["action"] == "se_movio"
     assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
     assert respuesta["to_broadcast"]["data"]["posicion_final"] == j2.posicion
-    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
@@ -319,7 +318,7 @@ def test_anunciar_sospecha_vale():
     respuesta = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     assert respuesta["message_to"]["action"] == "muestra"
     assert respuesta["message_to"]["id_jugador"] == j3.id_jugador
-    assert j1.estado_turno == "F"
+    assert j1.estado_turno == "EC"
     assert j3.estado_turno == "MS"
 
 
