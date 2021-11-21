@@ -17,14 +17,13 @@ def pasar_turno(jugador, partida):
         jugador.estado_turno = "N"
         jugador_siguiente.estado_turno = "D"
         action1 = ""
-        action2 = "terminaron_turno"
+        action2 = ""
         action3 = "tu_turno"
+        action4 = "mensaje_sistema"
         data1 = ""
-        data2 = {
-            "nombre_jugador": jugador_siguiente.apodo,
-            "lista_jugadores": lista_estado_jugadores(partida)
-        }
+        data2 = ""
         data3 = ""
+        data4 = {"message": f"El jugador {jugador.apodo} termino su turno. Ahora comienza el del jugador {jugador_siguiente.apodo}."}
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {
@@ -32,6 +31,7 @@ def pasar_turno(jugador, partida):
             "action": action3,
             "data": data3,
         }
+        system = {"action": action4, "data": data4}
     else: 
         action1 = "error_imp"
         data1 = {"message": "No estas en la etapa de pasar el turno"}
@@ -42,6 +42,7 @@ def pasar_turno(jugador, partida):
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 
@@ -55,7 +56,7 @@ def jugador_esta_en_turno(jugador, partida):
 def tirar_dado(jugador, partida):
     if jugador_esta_en_turno(jugador, partida) and jugador.estado_turno == "D":
         action1 = "tire_dado"
-        action2 = "tiraron_dado"
+        action2 = ""
         action3 = ""
         action4 = "mensaje_sistema"
         dado = numero_dado()
@@ -65,7 +66,7 @@ def tirar_dado(jugador, partida):
 
         data1 = {"numero_dado": dado, "casillas_a_mover": casillas_a_mover}
 
-        data2 = {"nombre_jugador": jugador.apodo, "numero_dado": dado}
+        data2 = ""
         data3 = ""
         data4 = {"message": f"El jugador {jugador.apodo} tiro el dado y obtuvo un {dado}"}
         personal_message = {"action": action1, "data": data1}
@@ -111,6 +112,7 @@ def mover_jugador(jugador, nueva_posicion):
         action1 = "me_movi"
         action2 = "se_movio"
         action3 = ""
+        action4 = ""
         data1 = {"posicion_final": nueva_posicion}
         data2 = {
             "nombre_jugador": jugador.apodo,
@@ -118,9 +120,11 @@ def mover_jugador(jugador, nueva_posicion):
             "lista_jugadores": lista_estado_jugadores(partida),
         }
         data3 = ""
+        data4 = ""
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
+        system = {"action": action4, "data": data4}
     elif jugador.orden_turno != partida.jugador_en_turno:
         action1 = "error_imp"
         data1 = {"message": "No es tu turno"}
@@ -147,6 +151,7 @@ def mover_jugador(jugador, nueva_posicion):
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 
@@ -174,12 +179,14 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             action1 = ""
             action2 = "cartas_sospechadas_fail"
             action3 = ""
+            action4 = "mensaje_sistema"
             data1 = ""
             data2 = {
                 "nombre_sospechador": jugador.apodo,
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
             data3 = ""
+            data4 = f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores tiene alguna de esas cartas."
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -187,6 +194,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
                 "data": data3,
                 "id_jugador": -1,
             }
+            system = {"action": action4, "data": data4}
         else:
             partida.jugador_que_sospecha = jugador
             jugador.estado_turno = "F"
@@ -225,7 +233,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         to_broadcast = {"action": "", "data": ""}
         message_to = {"action": "", "data": "", "id_jugador": -1}
     elif jugador.posicion not in RECINTOS.keys():
-        action1 = "no_recinto"
+        action1 = "error_imp"
         action2 = ""
         action3 = ""
         data1 = {"message": "No estas en un recinto"}
@@ -242,6 +250,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 
