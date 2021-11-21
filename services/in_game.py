@@ -117,7 +117,6 @@ def mover_jugador(jugador, nueva_posicion):
         data2 = {
             "nombre_jugador": jugador.apodo,
             "posicion_final": nueva_posicion,
-            "lista_jugadores": lista_estado_jugadores(partida),
         }
         data3 = ""
         data4 = ""
@@ -194,7 +193,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             system = {"action": action4, "data": data4}
         else:
             partida.jugador_que_sospecha = jugador
-            jugador.estado_turno = "F"
+            jugador.estado_turno = "EC"
             jugador_que_muestra.estado_turno = "MS"
             action1 = ""
             action2 = "cartas_sospechadas"
@@ -270,6 +269,7 @@ def responder_sospecha(jugador, carta):
         data4 = ""
         cartas = []
         jugador.estado_turno = "N"
+        partida.jugador_que_sospecha.estado_turno = "F"
         for c in jugador.cartas:
             cartas.append(c.nombre)
         if carta in cartas:
@@ -339,7 +339,6 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
-                "lista_jugadores": lista_estado_jugadores(partida),
                 "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
                     "nombre_jugador"
                 ],
@@ -404,7 +403,7 @@ def estado_jugadores(partida):
 @pony.db_session()
 def lista_estado_jugadores(partida):
     lista = []
-    for jugador in partida.jugadores:
+    for jugador in partida.jugadores.order_by(db.Jugador.orden_turno):
         lista.append(
             {
                 "id_jugador": jugador.id_jugador,
@@ -412,7 +411,7 @@ def lista_estado_jugadores(partida):
                 "color": jugador.color,
                 "posicion": jugador.posicion,
                 "orden": jugador.orden_turno,
-                "estado_turno": jugador.estado_turno,
+                "estado_turno": jugador.estado_turno_front(),
                 "en_turno": jugador.orden_turno == partida.jugador_en_turno,
             }
         )
