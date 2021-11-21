@@ -34,8 +34,9 @@ def jugador_conectado_lobby(jugador, partida):
 
 @pony.db_session()
 def jugador_desconectado_lobby(jugador, partida):
-    jugador.eliminar_de_partida(partida)
-    pony.commit()
+    if (partida.iniciada == False):
+        jugador.eliminar_de_partida(partida)
+        pony.commit()
     jugadores = []
     for j in partida.jugadores:
         jugadores.append(j.apodo)
