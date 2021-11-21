@@ -18,7 +18,7 @@ def pasar_turno(jugador, partida):
         jugador_siguiente.estado_turno = "D"
         action1 = ""
         action2 = ""
-        action3 = "tu_turno"
+        action3 = ""
         action4 = "mensaje_sistema"
         data1 = ""
         data2 = ""
@@ -110,15 +110,11 @@ def mover_jugador(jugador, nueva_posicion):
         jugador.cambiar_posicion(nueva_posicion)
         jugador.estado_turno = "SA"
         action1 = "me_movi"
-        action2 = "se_movio"
+        action2 = ""
         action3 = ""
         action4 = ""
         data1 = {"posicion_final": nueva_posicion}
-        data2 = {
-            "nombre_jugador": jugador.apodo,
-            "posicion_final": nueva_posicion,
-            "lista_jugadores": lista_estado_jugadores(partida),
-        }
+        data2 = ""
         data3 = ""
         data4 = ""
         personal_message = {"action": action1, "data": data1}
