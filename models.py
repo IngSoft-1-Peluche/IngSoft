@@ -8,6 +8,7 @@ ESTADOS_TURNO_JUGADOR = {
     "D": "Tirar Dado",
     "M": "Mover",
     "SA": "Sospechar/Acusar",
+    "EC": "Esperar carta",
     "F": "Fin de turno",
     "MS": "Mostrar sospecha"
 }
