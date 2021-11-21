@@ -114,14 +114,7 @@ def mover_jugador(jugador, nueva_posicion):
         action3 = ""
         action4 = ""
         data1 = {"posicion_final": nueva_posicion}
-<<<<<<< HEAD
         data2 = ""
-=======
-        data2 = {
-            "nombre_jugador": jugador.apodo,
-            "posicion_final": nueva_posicion,
-        }
->>>>>>> 8ce8ef2dcfe90a7c3fe067a73e5af54efafafb74
         data3 = ""
         data4 = ""
         personal_message = {"action": action1, "data": data1}
