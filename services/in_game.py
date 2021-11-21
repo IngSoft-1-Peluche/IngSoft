@@ -184,7 +184,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data1 = ""
             data2 = ""
             data3 = ""
-            data4 = f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores tiene alguna de esas cartas."
+            data4 = f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores restantes tiene alguna de esas cartas."
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {

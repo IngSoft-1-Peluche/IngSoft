@@ -359,6 +359,7 @@ def test_anunciar_sospecha_fail():
     mi_partida_de_2.jugador_en_turno = 1
     pony.commit()
     j1.estado_turno = "SA"
+    respuesta = anunciar_sospecha(j1, "carta_prueba_3", "carta_prueba_2")
     assert j1.estado_turno == "F"
 
 
