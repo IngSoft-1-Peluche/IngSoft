@@ -42,6 +42,7 @@ def jugador_desconectado_lobby(jugador, partida):
     action1 = ""
     action2 = "jugador_desconectado_lobby"
     action3 = ""
+    action4 = "mensaje_sistema"
     data1 = ""
     data2 = {
         "jugador_desconectado": jugador.apodo,
@@ -50,6 +51,7 @@ def jugador_desconectado_lobby(jugador, partida):
         "jugadores": jugadores,
     }
     data3 = ""
+    data4 = {"message": f"El jugador {jugador.apodo} se desconecto de la partida"}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
@@ -57,10 +59,12 @@ def jugador_desconectado_lobby(jugador, partida):
         "data": data3,
         "id_jugador": -1,
     }
+    system = {"action": action4, "data": data4}
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
         "message_to": message_to,
+        "system": system,
     }
 
 

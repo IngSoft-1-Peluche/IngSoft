@@ -263,8 +263,9 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 respuesta["to_broadcast"]["data"],
                 partida.id_partida,
             )
-            await manager.broadcast(
-                "error_imp",
-                f"El jugador #{id_jugador} se fue de la partida",
+
+            await manager.broadcast_system(
+                respuesta["system"]["action"],
+                respuesta["system"]["data"],
                 partida.id_partida,
             )
