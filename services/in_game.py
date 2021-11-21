@@ -184,7 +184,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data1 = ""
             data2 = ""
             data3 = ""
-            data4 = f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores restantes tiene alguna de esas cartas."
+            data4 = {"message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores restantes tiene alguna de esas cartas."}
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -208,7 +208,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
             data3 = {}
-            data4 = {"mesagge": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. El jugador {jugador_que_muestra.apodo} tiene que responder."}
+            data4 = {"message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. El jugador {jugador_que_muestra.apodo} tiene que responder."}
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -280,7 +280,7 @@ def responder_sospecha(jugador, carta):
             action2 = ""
             data2 = ""
             action3 = "carta_seleccionada"
-            data3 = {"carta_seleccionada": carta}
+            data3 = {"message": f"El jugador {jugador.apodo} tiene {carta}"}
             action4 = "mensaje_sistema"
             data4 = {"message": f"El jugador {jugador.apodo} respondio a la sospecha."}
         personal_message = {"action": action1, "data": data1}
