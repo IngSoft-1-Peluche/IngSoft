@@ -2,7 +2,7 @@ import pony.orm as pony
 import random
 
 from .board_functions import posiciones_posibles_a_mover
-from board.board import RECINTOS
+from board.board import RECINTOS, TRAMPAS
 from models import db
 
 
@@ -119,6 +119,10 @@ def mover_jugador(jugador, nueva_posicion):
         data2 = ""
         data3 = ""
         data4 = ""
+        if nueva_posicion in TRAMPAS:
+            action4 = "mensaje_sistema"
+            data4 =  {"message": f"El jugador {jugador.apodo} cayó en una trampa, pierde un turno."}
+            jugador.estado_turno = "F"
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
