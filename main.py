@@ -255,7 +255,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta["system"]["data"],
                     partida.id_partida,
                 )
-        except WebSocketDisconnect:
+        except WebSocketDisconnect:  
             manager.disconnect(websocket)
             respuesta = jugador_desconectado_lobby(jugador, partida)
             await manager.broadcast(
@@ -263,9 +263,10 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 respuesta["to_broadcast"]["data"],
                 partida.id_partida,
             )
-
             await manager.broadcast_system(
                 respuesta["system"]["action"],
                 respuesta["system"]["data"],
                 partida.id_partida,
             )
+            
+            
