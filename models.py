@@ -78,7 +78,7 @@ class Partida(db.Entity):
 
     @pony.db_session()
     def esta_terminada(self):
-        return any([j.ganador for j in self.jugadores])
+        return any([j.ganador for j in self.jugadores]) or all([j.acuso for j in self.jugadores])
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
