@@ -53,10 +53,18 @@ class Partida(db.Entity):
     def siguiente_jugador(self, pasar_turno=False):
         t = True
         i = 0
+        if all([j.en_trampa for j in self.jugadores]):
+            if pasar_turno:
+                for j in self.jugadores:
+                    j.en_trampa = False
+            while t:
+                siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
+                jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
+                t = jugador_siguiente.acuso
+                i += 1
+            return jugador_siguiente
         while t:
             siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
-            print(siguiente)
-            print(list(filter(lambda j: j.orden_turno == siguiente, self.jugadores)))
             jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
             t = jugador_siguiente.acuso or jugador_siguiente.en_trampa
             if pasar_turno:
