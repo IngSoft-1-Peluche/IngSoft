@@ -105,10 +105,6 @@ def test_pasar_turno():
     assert mi_partida_de_2.jugador_en_turno == 1
     assert respuesta["personal_message"]["action"] == ""
     assert respuesta["personal_message"]["data"] == ""
-    assert respuesta["to_broadcast"]["action"] == "terminaron_turno"
-    assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j1.apodo
-    assert "lista_jugadores" in respuesta["to_broadcast"]["data"].keys()
-    assert respuesta["message_to"]["action"] == "tu_turno"
     assert respuesta["message_to"]["data"] == ""
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
     assert j2.estado_turno == "N"
@@ -150,9 +146,6 @@ def test_tirar_dado_vale():
     assert type(respuesta["personal_message"]["data"]["numero_dado"]) == int
     assert 0 < respuesta["personal_message"]["data"]["numero_dado"] < 7
     assert respuesta["personal_message"]["data"]["casillas_a_mover"] != None
-    assert respuesta["to_broadcast"]["action"] == "tiraron_dado"
-    assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
-    assert 0 < respuesta["to_broadcast"]["data"]["numero_dado"] < 7
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
@@ -204,9 +197,6 @@ def test_mover_jugador_vale():
     assert (j2.posicion in posibles_casillas) == True
     assert respuesta["personal_message"]["action"] == "me_movi"
     assert respuesta["personal_message"]["data"]["posicion_final"] == j2.posicion
-    assert respuesta["to_broadcast"]["action"] == "se_movio"
-    assert respuesta["to_broadcast"]["data"]["nombre_jugador"] == j2.apodo
-    assert respuesta["to_broadcast"]["data"]["posicion_final"] == j2.posicion
     assert respuesta["message_to"]["action"] == ""
     assert respuesta["message_to"]["data"] == ""
     assert type(respuesta["message_to"]["id_jugador"]) == int
@@ -369,14 +359,6 @@ def test_anunciar_sospecha_fail():
     mi_partida_de_2.jugador_en_turno = 1
     pony.commit()
     j1.estado_turno = "SA"
-    respuesta = anunciar_sospecha(j1, "carta_prueba_3", "carta_prueba_2")
-    assert respuesta["to_broadcast"]["action"] == "cartas_sospechadas_fail"
-    assert respuesta["to_broadcast"]["data"]["nombre_sospechador"] == j1.apodo
-    assert respuesta["to_broadcast"]["data"]["cartas_sospechadas"] == [
-        "Cochera",
-        "carta_prueba_3",
-        "carta_prueba_2",
-    ]
     assert j1.estado_turno == "F"
 
 

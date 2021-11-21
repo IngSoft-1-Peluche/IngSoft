@@ -79,6 +79,7 @@ def tirar_dado(jugador, partida):
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": "", "data": ""}
         message_to = {"action": "", "data": "", "id_jugador": -1}
+        system = {"action": "", "data": ""}
     else:
         action1 = "error_imp"
         data1 = {"message": "No es tu turno"}
@@ -89,6 +90,7 @@ def tirar_dado(jugador, partida):
         action3 = ""
         data3 = ""
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
+        system = {"action": "", "data": ""}
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
@@ -127,12 +129,14 @@ def mover_jugador(jugador, nueva_posicion):
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": "", "data": ""}
         message_to = {"action": "", "data": "", "id_jugador": -1}
+        system = {"action": "", "data": ""}
     elif jugador.estado_turno != "M":
         action1 = "error_imp"
         data1 = {"message": "No estas en la etapa de moverte"}
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": "", "data": ""}
         message_to = {"action": "", "data": "", "id_jugador": -1}
+        system = {"action": "", "data": ""}
     else:
         action1 = "casilla_invalida"
         action2 = ""
@@ -143,6 +147,7 @@ def mover_jugador(jugador, nueva_posicion):
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
+        system = {"action": "", "data": ""}
     return {
         "personal_message": personal_message,
         "to_broadcast": to_broadcast,
@@ -336,9 +341,6 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
             }
             respuesta_broadcast["data"] = {
                 "perdedor": jugador.apodo,
-                "jugador_sig_turno": respuesta_pasar_turno["to_broadcast"]["data"][
-                    "nombre_jugador"
-                ],
                 "monstruo_acusado": carta_monstruo,
                 "victima_acusado": carta_victima,
                 "recinto_acusado": carta_recinto,
