@@ -92,6 +92,7 @@ def mostrar_cartas(jugador):
     respuesta_to = {"action": "", "data": "", "id_jugador": -1}
     respuesta["action"] = "mostrar_cartas"
     data = {"cartas": []}
+    respuesta_sistema = {"action": "", "data": ""}
     for carta in jugador.cartas:
         data["cartas"].append(carta.nombre)
     respuesta["data"] = data
@@ -99,4 +100,5 @@ def mostrar_cartas(jugador):
         "personal_message": respuesta,
         "to_broadcast": respuesta_broadcast,
         "message_to": respuesta_to,
+        "system": respuesta_sistema,
     }

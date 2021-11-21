@@ -30,3 +30,9 @@ class ConnectionManager:
             for connection in self.active_connections:
                 if connection[1] == id_partida:
                     await connection[2].send_json({"action": action, "data": data})
+
+    async def broadcast_system(self, action, data, id_partida):
+        if data != "":
+            for connection in self.active_connections:
+                if connection[1] == id_partida:
+                    await connection[2].send_json({"action": action, "data": data})
