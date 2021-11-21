@@ -265,7 +265,7 @@ def test_anunciar_sospecha_vale():
     respuesta = anunciar_sospecha(j1, "carta_prueba_1", "carta_prueba_2")
     assert respuesta["message_to"]["action"] == "muestra"
     assert respuesta["message_to"]["id_jugador"] == j3.id_jugador
-    assert j1.estado_turno == "F"
+    assert j1.estado_turno == "EC"
     assert j3.estado_turno == "MS"
 
 
