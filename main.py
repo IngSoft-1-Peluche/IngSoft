@@ -8,6 +8,7 @@ from my_sockets import ConnectionManager
 from services.start_game import (
     iniciar_partida_service,
     mostrar_cartas,
+    bruja_salem,
 )
 from services.lobby import (
     jugador_conectado_lobby,
@@ -185,6 +186,17 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 respuesta_mostrar_cartas["personal_message"]["action"],
                 respuesta_mostrar_cartas["personal_message"]["data"],
                 websocket,
+            )
+            respuesta_bruja_salem = bruja_salem(jugador, partida)
+            await manager.send_personal_message(
+                respuesta_bruja_salem["personal_message"]["action"],
+                respuesta_bruja_salem["personal_message"]["data"],
+                websocket,
+            )
+            await manager.broadcast_system(
+                respuesta_bruja_salem["system"]["action"],
+                respuesta_bruja_salem["system"]["data"],
+                partida.id_partida,
             )
         
         else: 

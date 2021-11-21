@@ -26,6 +26,7 @@ class Partida(db.Entity):
     jugador_que_sospecha = pony.Optional("Jugador", reverse="sospecha")
     cartas = pony.Set("Carta", reverse="partida")
     sobre = pony.Set("Carta", reverse="sobre")
+    se_jugo_bruja = pony.Required(bool, default=False)
 
     @pony.db_session()
     def cantidad_jugadores(self):
