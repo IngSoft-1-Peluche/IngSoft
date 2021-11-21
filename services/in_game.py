@@ -194,7 +194,7 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             }
         else:
             partida.jugador_que_sospecha = jugador
-            jugador.estado_turno = "F"
+            jugador.estado_turno = "EC"
             jugador_que_muestra.estado_turno = "MS"
             action1 = ""
             action2 = "cartas_sospechadas"
@@ -260,6 +260,7 @@ def responder_sospecha(jugador, carta):
         data3 = ""
         cartas = []
         jugador.estado_turno = "N"
+        partida.jugador_que_sospecha.estado_turno = "F"
         for c in jugador.cartas:
             cartas.append(c.nombre)
         if carta in cartas:
