@@ -77,7 +77,7 @@ CARTAS = [
     ("Doncella", "V"),
     ("Jardinero", "V"),
     ("Mayordomo", "V"),
-    ("Dr Jekyll Mr Hyde", "M"),
+    ("Dr. Jekyll Mr Hyde", "M"),
     ("Dracula", "M"),
     ("Fantasma", "M"),
     ("Frankenstein", "M"),

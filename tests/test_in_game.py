@@ -415,7 +415,7 @@ def test_responder_sospecha_vale():
     respuesta = responder_sospecha(j3, "carta_prueba_1")
     pony.commit()
     assert respuesta["message_to"]["action"] == "carta_seleccionada"
-    assert respuesta["message_to"]["data"]["carta_seleccionada"] == "carta_prueba_1"
+    assert respuesta["message_to"]["data"]["message"] == "El jugador j3 tiene carta_prueba_1"
     assert respuesta["message_to"]["id_jugador"] == j1.id_jugador
     assert j1.estado_turno == "F"
 
