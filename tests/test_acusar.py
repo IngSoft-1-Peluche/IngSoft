@@ -24,37 +24,80 @@ def test_acusar():
             carta_victima = carta.nombre
         elif carta.tipo == "R":
             carta_recinto = carta.nombre
-    
+
     for recinto in ["Alcoba", "Biblioteca"]:
         if carta_recinto != recinto:
             recinto_incorrecto = recinto
-    
+
     for j in p1.jugadores:
         if j.orden_turno == p1.jugador_en_turno:
             jugador_turno = j
+            jugador_turno.estado_turno = "SA"
         else:
             jugador_no_turno = j
-    respuesta_no_turno = acusar(jugador_no_turno, p1, carta_monstruo, carta_victima, carta_recinto)
-    respuesta_correcta = acusar(jugador_turno, p1, carta_monstruo, carta_victima, carta_recinto)
-    respuesta_incorrecta = acusar(jugador_turno, p1, carta_monstruo, carta_victima, recinto_incorrecto)
-            
+    respuesta_no_turno = acusar(
+        jugador_no_turno, p1, carta_monstruo, carta_victima, carta_recinto
+    )
+    assert jugador_no_turno.estado_turno == "N"
+    assert p1.esta_terminada() == False
+    respuesta_correcta = acusar(
+        jugador_turno, p1, carta_monstruo, carta_victima, carta_recinto
+    )
+    assert jugador_turno.estado_turno == "N"
+    assert jugador_turno.acuso == True
+    assert jugador_turno.ganador == True
+    assert p1.esta_terminada() == True
+    jugador_turno.estado_turno = "SA"
+    jugador_turno.acuso = False
+    respuesta_incorrecta = acusar(
+        jugador_turno, p1, carta_monstruo, carta_victima, recinto_incorrecto
+    )
+    assert jugador_turno.estado_turno == "N"
 
+    assert jugador_turno.acuso == True
+    assert jugador_no_turno.acuso == False
     assert respuesta_no_turno["personal_message"]["action"] == "error_imp"
     assert respuesta_no_turno["personal_message"]["data"]["message"] == "No es tu turno"
     assert respuesta_correcta["personal_message"]["action"] == "acuse"
     assert respuesta_correcta["personal_message"]["data"]["message"] == "ganaste"
     assert respuesta_correcta["to_broadcast"]["action"] == "acuso"
     assert respuesta_correcta["to_broadcast"]["data"]["ganador"] == jugador_turno.apodo
-    assert respuesta_correcta["to_broadcast"]["data"]["monstruo_en_sobre"] == carta_monstruo
-    assert respuesta_correcta["to_broadcast"]["data"]["victima_en_sobre"] == carta_victima
-    assert respuesta_correcta["to_broadcast"]["data"]["recinto_en_sobre"] == carta_recinto
+    assert (
+        respuesta_correcta["to_broadcast"]["data"]["monstruo_en_sobre"]
+        == carta_monstruo
+    )
+    assert (
+        respuesta_correcta["to_broadcast"]["data"]["victima_en_sobre"] == carta_victima
+    )
+    assert (
+        respuesta_correcta["to_broadcast"]["data"]["recinto_en_sobre"] == carta_recinto
+    )
     assert respuesta_incorrecta["personal_message"]["action"] == "acuse"
     assert respuesta_incorrecta["personal_message"]["data"]["message"] == "perdiste"
-    assert respuesta_incorrecta["personal_message"]["data"]["monstruo_en_sobre"] == carta_monstruo
-    assert respuesta_incorrecta["personal_message"]["data"]["victima_en_sobre"] == carta_victima
-    assert respuesta_incorrecta["personal_message"]["data"]["recinto_en_sobre"] == carta_recinto
+    assert (
+        respuesta_incorrecta["personal_message"]["data"]["monstruo_en_sobre"]
+        == carta_monstruo
+    )
+    assert (
+        respuesta_incorrecta["personal_message"]["data"]["victima_en_sobre"]
+        == carta_victima
+    )
+    assert (
+        respuesta_incorrecta["personal_message"]["data"]["recinto_en_sobre"]
+        == carta_recinto
+    )
     assert respuesta_incorrecta["to_broadcast"]["action"] == "acuso"
-    assert respuesta_incorrecta["to_broadcast"]["data"]["perdedor"] == jugador_turno.apodo
-    assert respuesta_incorrecta["to_broadcast"]["data"]["monstruo_acusado"] == carta_monstruo
-    assert respuesta_incorrecta["to_broadcast"]["data"]["victima_acusado"] == carta_victima
-    assert respuesta_incorrecta["to_broadcast"]["data"]["recinto_acusado"] == recinto_incorrecto
+    assert (
+        respuesta_incorrecta["to_broadcast"]["data"]["perdedor"] == jugador_turno.apodo
+    )
+    assert (
+        respuesta_incorrecta["to_broadcast"]["data"]["monstruo_acusado"]
+        == carta_monstruo
+    )
+    assert (
+        respuesta_incorrecta["to_broadcast"]["data"]["victima_acusado"] == carta_victima
+    )
+    assert (
+        respuesta_incorrecta["to_broadcast"]["data"]["recinto_acusado"]
+        == recinto_incorrecto
+    )

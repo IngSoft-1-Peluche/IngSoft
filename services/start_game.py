@@ -3,13 +3,15 @@ from models import db
 import random
 import numpy as np
 
-from board.board import CARTAS
+from board.board import CARTAS, PUERTAS, COLORES
 
 
 @pony.db_session()
 def iniciar_partida_service(partida):
     partida.iniciada = True
     asignar_orden_aleatorio(partida)
+    asignar_posiciones_iniciales(partida)
+    asignar_colores(partida)
     crear_cartas(partida)
     generar_sobre(partida)
     distribuir_cartas(partida)
@@ -22,25 +24,34 @@ def asignar_orden_aleatorio(partida):
     i = 1
     for jugador in jugadores:
         jugador.orden_turno = i
+        if i == 1:
+            jugador.estado_turno = "D"
+        i += 1
+    return jugadores
+
+
+@pony.db_session()
+def asignar_posiciones_iniciales(partida):
+    jugadores = partida.jugadores
+    random.shuffle(list(jugadores))
+    for jugador in jugadores:
+        jugador.posicion = random.choice(PUERTAS)
+    return jugadores
+
+
+@pony.db_session()
+def asignar_colores(partida):
+    jugadores = partida.jugadores
+    random.shuffle(list(jugadores))
+    i = 0
+    for jugador in jugadores:
+        jugador.color = COLORES[i]
         i += 1
     return jugadores
 
 
 def tirar_dado():
     return random.randint(1, 6)
-
-
-@pony.db_session()
-def pasar_turno(partida):
-    jugadores = partida.jugadores
-    partida.jugador_en_turno = (partida.jugador_en_turno % len(jugadores)) + 1
-
-
-def jugador_esta_en_turno(jugador, partida):
-    if jugador.orden_turno == partida.jugador_en_turno:
-        return True
-    else:
-        return False
 
 
 @pony.db_session()
@@ -81,6 +92,7 @@ def mostrar_cartas(jugador):
     respuesta_to = {"action": "", "data": "", "id_jugador": -1}
     respuesta["action"] = "mostrar_cartas"
     data = {"cartas": []}
+    respuesta_sistema = {"action": "", "data": ""}
     for carta in jugador.cartas:
         data["cartas"].append(carta.nombre)
     respuesta["data"] = data
@@ -88,4 +100,39 @@ def mostrar_cartas(jugador):
         "personal_message": respuesta,
         "to_broadcast": respuesta_broadcast,
         "message_to": respuesta_to,
+        "system": respuesta_sistema,
+    }
+
+
+@pony.db_session()
+def bruja_salem(jugador, partida):
+    tiene_bruja = False
+    for carta in jugador.cartas:
+        if carta.nombre == "Bruja de Salem":
+            tiene_bruja = True
+
+    respuesta = {"action": "", "data": ""}
+    respuesta_broadcast = {"action": "", "data": ""}
+    respuesta_to = {"action": "", "data": "", "id_jugador": -1}
+    respuesta_sistema = {"action": "", "data": ""}
+    if tiene_bruja and not partida.se_jugo_bruja:
+        partida.se_jugo_bruja = True
+        carta_random_sobre = partida.sobre.random(1)[0]
+        respuesta = {
+            "action": "error_imp",
+            "data": {
+                "message": f"Te toco la Bruja de Salem. La carta del sobre que se te mostro es {carta_random_sobre.nombre}"
+            },
+        }
+        respuesta_sistema = {
+            "action": "mensaje_sistema",
+            "data": {
+                "message": f"Al jugador {jugador.apodo} le toco la Bruja de Salem y ahora sabe una carta del sobre"
+            },
+        }
+    return {
+        "personal_message": respuesta,
+        "to_broadcast": respuesta_broadcast,
+        "message_to": respuesta_to,
+        "system": respuesta_sistema,
     }

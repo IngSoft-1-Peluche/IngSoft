@@ -1,3 +1,8 @@
+import os
+
+if os.path.exists("database.sqlite"):
+    os.remove("database.sqlite")
+
 from fastapi.testclient import TestClient
 import pony.orm as pony
 from fastapi import status
@@ -9,6 +14,7 @@ from .test_board import *
 from .test_cards import *
 from .test_acusar import *
 from .test_in_game import *
+from .test_lobby import *
 
 client = TestClient(app)
 
@@ -73,7 +79,7 @@ def test_post_crear_partida():
 
 @pony.db_session
 def test_detalle_partida_endpoint():
-    partida = db.Partida.select()[:1][0]
+    partida = db.Partida.select().first()
     response = client.get("/partidas/%s" % partida.id_partida)
     partida_json = response.json()
 
@@ -88,31 +94,54 @@ def test_detalle_partida_endpoint():
 
 @pony.db_session
 def test_unirse_a_partida():
-    response = client.put("/partidas/1", params={"apodo": "ultimo"})
-    assert response.json()["id_partida"] == 1
-    assert response.json()["nombre_partida"] == db.Partida[1].nombre
+    _response = client.post("/partidas/")
+    _response = client.post(
+        "/partidas/",
+        json={"nombre_partida": "nombre de mi partida", "apodo": "apodo de mi jugador"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "ultimo"},
+    )
+
+    assert response.json()["id_partida"] == _response.json()["id_partida"]
+    assert response.json()["nombre_partida"] == _response.json()["nombre_partida"]
+    assert type(response.json()["id_jugador"]) == int
     assert response.json()["apodo"] == "ultimo"
     assert response.json()["jugador_creador"] == False
 
 
 @pony.db_session
 def test_unirse_a_partida_llena():
-    j1 = db.Jugador(apodo="juan")
-    j2 = db.Jugador(apodo="maria")
-    j3 = db.Jugador(apodo="j3")
-    j4 = db.Jugador(apodo="m4")
-    j5 = db.Jugador(apodo="j5")
-    j6 = db.Jugador(apodo="m6")
-    pony.flush()
-    p1 = db.Partida(nombre="partida llena", iniciada=False, creador=j1)
-    j1.partida = p1
-    j2.partida = p1
-    j3.partida = p1
-    j4.partida = p1
-    j5.partida = p1
-    j6.partida = p1
-    pony.commit()
-    response = client.put("/partidas/%s" % p1.id_partida, params={"apodo": "no_entra"})
+    _response = client.post("/partidas/")
+    _response = client.post(
+        "/partidas/",
+        json={"nombre_partida": "partida llena", "apodo": "apodo de mi jugador"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "segundo"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "tercero"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "cuarto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "quinto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "sexto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "afuera"},
+    )
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -135,60 +164,3 @@ def test_asignar_orden():
     n = len(p1.jugadores)
     ordenes = [j.orden_turno for j in p1.jugadores]
     assert set(range(1, n + 1)) == set(ordenes)
-
-
-@pony.db_session
-def test_inciar_partida_correcta():
-    j1 = db.Jugador(apodo="juan")
-    j2 = db.Jugador(apodo="maria")
-    j3 = db.Jugador(apodo="j3")
-    j4 = db.Jugador(apodo="m4")
-    j5 = db.Jugador(apodo="j5")
-    j6 = db.Jugador(apodo="m6")
-    pony.flush()
-    p1 = db.Partida(nombre="Partida a iniciar", iniciada=False, creador=j1)
-    j1.partida = p1
-    j2.partida = p1
-    j3.partida = p1
-    j4.partida = p1
-    j5.partida = p1
-    j6.partida = p1
-    pony.commit()
-
-    response = client.patch(
-        "/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador}
-    )
-
-    assert response.status_code == status.HTTP_201_CREATED
-
-
-@pony.db_session
-def test_inciar_partida_uno_solo():
-    j1 = db.Jugador(apodo="juan")
-    pony.flush()
-    p1 = db.Partida(nombre="Partida de uno solo", iniciada=False, creador=j1)
-    j1.partida = p1
-    pony.commit()
-
-    response = client.patch(
-        "/partidas/%s" % p1.id_partida, params={"id_jugador": j1.id_jugador}
-    )
-
-    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-
-
-@pony.db_session
-def test_inciar_partida_no_creador():
-    j1 = db.Jugador(apodo="juan")
-    j2 = db.Jugador(apodo="maria")
-    pony.flush()
-    p1 = db.Partida(nombre="Partida que no puede iniciarse", iniciada=False, creador=j1)
-    j1.partida = p1
-    j2.partida = p1
-    pony.commit()
-
-    response = client.patch(
-        "/partidas/%s" % p1.id_partida, params={"id_jugador": j2.id_jugador}
-    )
-
-    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR

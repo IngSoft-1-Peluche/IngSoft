@@ -15,6 +15,10 @@ class ConnectionManager:
             if connection[2] == websocket:
                 self.active_connections.remove(connection)
 
+    def count_id_jugador_websockets(self, id_jugador):
+        ws_id_jugador = [ws for ws in self.active_connections if ws[0] == id_jugador]
+        return len(ws_id_jugador)
+
     async def send_message_to(self, action, data, id_jugador):
         if data != "":
             for connection in self.active_connections:
@@ -26,6 +30,12 @@ class ConnectionManager:
             await websocket.send_json({"action": action, "data": data})
 
     async def broadcast(self, action, data, id_partida):
+        if data != "":
+            for connection in self.active_connections:
+                if connection[1] == id_partida:
+                    await connection[2].send_json({"action": action, "data": data})
+
+    async def broadcast_system(self, action, data, id_partida):
         if data != "":
             for connection in self.active_connections:
                 if connection[1] == id_partida:

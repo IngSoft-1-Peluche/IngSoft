@@ -1,6 +1,18 @@
 import numpy as np
 
-TIPOS_CASILLAS = {"C": "Casilla común", "R": "Recinto"}
+TIPOS_CASILLAS = {
+    "C": "Casilla común",
+    "R": "Recinto",
+    "M": "Murcielago",
+    "S": "Serpiente",
+    "E": "Escorpion",
+    "A": "Araña",
+    "T": "Trampa",
+}
+
+TRAMPAS = [22, 29, 56, 63]
+
+COLORES = ["red", "green", "blue", "yellow", "deepskyblue", "orange"]
 
 MATRIZ_TABLERO = np.genfromtxt("board/tablero.csv", delimiter=",")
 
@@ -21,6 +33,21 @@ for i in range(1, 85):
 for i in [1, 3, 5, 36, 39, 70, 72, 74]:
     CASILLAS[i] = "R"
 
+CASILLAS[12] = "M"
+CASILLAS[11] = "E"
+CASILLAS[19] = "S"
+CASILLAS[30] = "S"
+CASILLAS[54] = "A"
+CASILLAS[65] = "A"
+CASILLAS[71] = "M"
+CASILLAS[73] = "E"
+
+CASILLAS[22] = "T"
+CASILLAS[29] = "T"
+CASILLAS[56] = "T"
+CASILLAS[63] = "T"
+
+
 RECINTOS = {
     1: "Cochera",
     3: "Alcoba",
@@ -29,8 +56,10 @@ RECINTOS = {
     39: "Panteon",
     70: "Bodega",
     72: "Salon",
-    74: "Laboratorio"
+    74: "Laboratorio",
 }
+
+PUERTAS = [2, 4, 16, 35, 50, 69, 83, 84]
 
 CARTAS = [
     ("Alcoba", "R"),
@@ -48,7 +77,7 @@ CARTAS = [
     ("Doncella", "V"),
     ("Jardinero", "V"),
     ("Mayordomo", "V"),
-    ("Dr Jekyll Mr Hyde", "M"),
+    ("Dr. Jekyll Mr Hyde", "M"),
     ("Dracula", "M"),
     ("Fantasma", "M"),
     ("Frankenstein", "M"),

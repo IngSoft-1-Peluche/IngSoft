@@ -1,6 +1,17 @@
 import pony.orm as pony
 from fastapi import HTTPException
-import random
+
+from board.board import RECINTOS, TRAMPAS
+
+ESTADOS_TURNO_JUGADOR = {
+    "N": "No tiene turno",
+    "D": "Tirar Dado",
+    "M": "Mover",
+    "SA": "Sospechar/Acusar",
+    "EC": "Esperar carta",
+    "F": "Fin de turno",
+    "MS": "Mostrar sospecha",
+}
 
 db = pony.Database()
 
@@ -15,6 +26,7 @@ class Partida(db.Entity):
     jugador_que_sospecha = pony.Optional("Jugador", reverse="sospecha")
     cartas = pony.Set("Carta", reverse="partida")
     sobre = pony.Set("Carta", reverse="sobre")
+    se_jugo_bruja = pony.Required(bool, default=False)
 
     @pony.db_session()
     def cantidad_jugadores(self):
@@ -38,6 +50,43 @@ class Partida(db.Entity):
             if carta.tipo == "R":
                 return carta
 
+    @pony.db_session()
+    def siguiente_jugador(self, pasar_turno=False):
+        t = True
+        i = 0
+        if all([j.en_trampa for j in self.jugadores]):
+            if pasar_turno:
+                for j in self.jugadores:
+                    j.en_trampa = False
+            while t:
+                siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
+                jugador_siguiente = next(
+                    filter(lambda j: j.orden_turno == siguiente, self.jugadores)
+                )
+                t = jugador_siguiente.acuso
+                i += 1
+            return jugador_siguiente
+        while t:
+            siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
+            jugador_siguiente = next(
+                filter(lambda j: j.orden_turno == siguiente, self.jugadores)
+            )
+            t = jugador_siguiente.acuso or jugador_siguiente.en_trampa
+            if pasar_turno:
+                jugador_siguiente.en_trampa = False
+            i += 1
+        return jugador_siguiente
+
+    @pony.db_session()
+    def pasar_turno(self):
+        self.jugador_en_turno = self.siguiente_jugador(pasar_turno=True).orden_turno
+
+    @pony.db_session()
+    def esta_terminada(self):
+        return any([j.ganador for j in self.jugadores]) or all(
+            [j.acuso for j in self.jugadores]
+        )
+
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
@@ -49,14 +98,36 @@ class Jugador(db.Entity):
     ultima_tirada = pony.Optional(int)
     cartas = pony.Set("Carta", reverse="jugador")
     sospecha = pony.Optional("Partida", reverse="jugador_que_sospecha")
+    color = pony.Optional(str)
+    estado_turno = pony.Optional(str, default="N")
+    acuso = pony.Required(bool, default=False)
+    ganador = pony.Required(bool, default=False)
+    en_trampa = pony.Required(bool, default=False)
 
     @pony.db_session()
     def asociar_a_partida(self, partida):
         partida.jugadores.add(self)
 
     @pony.db_session()
+    def eliminar_de_partida(self, partida):
+        partida.jugadores.remove(self)
+
+    @pony.db_session()
     def cambiar_posicion(self, nueva_pos):
         self.posicion = nueva_pos
+        if nueva_pos in TRAMPAS:
+            self.en_trampa = True
+
+    @pony.db_session()
+    def estado_turno_front(self):
+        if self.partida.esta_terminada():
+            return "T"
+        elif self.estado_turno == "SA" and self.posicion in RECINTOS.keys():
+            return self.estado_turno
+        elif self.estado_turno == "SA" and self.posicion not in RECINTOS.keys():
+            return "A"
+        else:
+            return self.estado_turno
 
 
 class Carta(db.Entity):

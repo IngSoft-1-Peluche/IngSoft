@@ -27,6 +27,7 @@ def test_distribuir_cartas():
     assert abs(len(j1.cartas) - len(j3.cartas)) < 2
     assert abs(len(j2.cartas) - len(j3.cartas)) < 2
 
+
 @pony.db_session
 def test_mostrar_cartas():
     j1 = db.Jugador(apodo="juan")
@@ -40,9 +41,15 @@ def test_mostrar_cartas():
     iniciar_partida_service(p1)
     pony.commit()
 
-    assert mostrar_cartas(j1)['personal_message']['data']['cartas'] == [c.nombre for c in j1.cartas]
-    assert mostrar_cartas(j2)['personal_message']['data']['cartas'] == [c.nombre for c in j2.cartas]
-    assert mostrar_cartas(j3)['personal_message']['data']['cartas'] == [c.nombre for c in j3.cartas]
+    assert mostrar_cartas(j1)["personal_message"]["data"]["cartas"] == [
+        c.nombre for c in j1.cartas
+    ]
+    assert mostrar_cartas(j2)["personal_message"]["data"]["cartas"] == [
+        c.nombre for c in j2.cartas
+    ]
+    assert mostrar_cartas(j3)["personal_message"]["data"]["cartas"] == [
+        c.nombre for c in j3.cartas
+    ]
 
 
 @pony.db_session
@@ -57,7 +64,7 @@ def test_comprobar_cartas_sobre():
     j3.partida = p1
     iniciar_partida_service(p1)
     pony.commit()
-    
+
     cartas_acusadas = [c.nombre for c in p1.sobre]
 
     assert comprobar_cartas_sobre(p1, cartas_acusadas)
