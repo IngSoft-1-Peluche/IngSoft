@@ -91,15 +91,6 @@ def test_detalle_partida_endpoint():
 
 
 @pony.db_session
-def test_unirse_a_partida():
-    response = client.put("/partidas/1", params={"apodo": "ultimo"})
-    assert response.json()["id_partida"] == 1
-    assert response.json()["nombre_partida"] == db.Partida[1].nombre
-    assert response.json()["apodo"] == "ultimo"
-    assert response.json()["jugador_creador"] == False
-
-
-@pony.db_session
 def test_unirse_a_partida_llena():
     j1 = db.Jugador(apodo="juan")
     j2 = db.Jugador(apodo="maria")
