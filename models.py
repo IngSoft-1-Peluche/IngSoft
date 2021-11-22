@@ -114,7 +114,9 @@ class Jugador(db.Entity):
 
     @pony.db_session()
     def estado_turno_front(self):
-        if self.estado_turno == "SA" and self.posicion in RECINTOS.keys():
+        if self.partida.esta_terminada():
+            return "T"
+        elif self.estado_turno == "SA" and self.posicion in RECINTOS.keys():
             return self.estado_turno
         elif self.estado_turno == "SA" and self.posicion not in RECINTOS.keys():
             return "A"
