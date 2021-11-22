@@ -139,30 +139,6 @@ async def unirse_a_partida(nuevo_usuario: UnirseIn):
     )
 
 
-@app.patch("/partidas/{id_partida}", status_code=status.HTTP_201_CREATED)
-async def iniciar_partida(id_jugador: int, id_partida: int):
-    with pony.db_session:
-        partida = get_partida(id_partida)
-        if (
-            partida.iniciada == False
-            and 1 < len(partida.jugadores) < 7
-            and id_jugador == partida.creador.id_jugador
-        ):
-            iniciar_partida_service(partida)
-            return status.HTTP_201_CREATED
-        elif partida.iniciada == True:
-            raise HTTPException(status_code=500, detail="La partida ya se esta jugando")
-        elif id_jugador != partida.creador.id_jugador:
-            raise HTTPException(
-                status_code=500, detail="No eres el dueño de la partida"
-            )
-        else:
-            raise HTTPException(
-                status_code=500,
-                detail="La partida no cumple con los jugadores necesarios para iniciarse",
-            )
-
-
 # Toda la parte de WEBSockets
 
 manager = ConnectionManager()
