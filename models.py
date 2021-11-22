@@ -10,7 +10,7 @@ ESTADOS_TURNO_JUGADOR = {
     "SA": "Sospechar/Acusar",
     "EC": "Esperar carta",
     "F": "Fin de turno",
-    "MS": "Mostrar sospecha"
+    "MS": "Mostrar sospecha",
 }
 
 db = pony.Database()
@@ -49,7 +49,7 @@ class Partida(db.Entity):
         for carta in self.sobre:
             if carta.tipo == "R":
                 return carta
-    
+
     @pony.db_session()
     def siguiente_jugador(self, pasar_turno=False):
         t = True
@@ -60,13 +60,17 @@ class Partida(db.Entity):
                     j.en_trampa = False
             while t:
                 siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
-                jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
+                jugador_siguiente = next(
+                    filter(lambda j: j.orden_turno == siguiente, self.jugadores)
+                )
                 t = jugador_siguiente.acuso
                 i += 1
             return jugador_siguiente
         while t:
             siguiente = (self.jugador_en_turno + i) % len(self.jugadores) + 1
-            jugador_siguiente = next(filter(lambda j: j.orden_turno == siguiente, self.jugadores))
+            jugador_siguiente = next(
+                filter(lambda j: j.orden_turno == siguiente, self.jugadores)
+            )
             t = jugador_siguiente.acuso or jugador_siguiente.en_trampa
             if pasar_turno:
                 jugador_siguiente.en_trampa = False
@@ -79,7 +83,10 @@ class Partida(db.Entity):
 
     @pony.db_session()
     def esta_terminada(self):
-        return any([j.ganador for j in self.jugadores]) or all([j.acuso for j in self.jugadores])
+        return any([j.ganador for j in self.jugadores]) or all(
+            [j.acuso for j in self.jugadores]
+        )
+
 
 class Jugador(db.Entity):
     id_jugador = pony.PrimaryKey(int, auto=True)
@@ -110,7 +117,6 @@ class Jugador(db.Entity):
         self.posicion = nueva_pos
         if nueva_pos in TRAMPAS:
             self.en_trampa = True
-
 
     @pony.db_session()
     def estado_turno_front(self):

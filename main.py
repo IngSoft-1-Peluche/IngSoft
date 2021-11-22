@@ -150,7 +150,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
         jugador = get_jugador(id_jugador)
         partida = jugador.partida
         await manager.connect(jugador.id_jugador, partida.id_partida, websocket)
-        if (partida.iniciada == True):
+        if partida.iniciada == True:
             respuesta_inicial = estado_jugadores(partida)
             await manager.send_personal_message(
                 respuesta_inicial["personal_message"]["action"],
@@ -174,8 +174,8 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 respuesta_bruja_salem["system"]["data"],
                 partida.id_partida,
             )
-        
-        else: 
+
+        else:
             conexion = jugador_conectado_lobby(jugador, partida)
             await manager.broadcast(
                 conexion["to_broadcast"]["action"],
@@ -249,7 +249,7 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                     respuesta["system"]["data"],
                     partida.id_partida,
                 )
-        except WebSocketDisconnect:  
+        except WebSocketDisconnect:
             manager.disconnect(websocket)
             respuesta = jugador_desconectado_lobby(jugador, partida, manager)
             await manager.broadcast(
@@ -262,5 +262,3 @@ async def websocket_endpoint(websocket: WebSocket, id_jugador: int):
                 respuesta["system"]["data"],
                 partida.id_partida,
             )
-            
-            

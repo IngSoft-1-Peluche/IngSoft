@@ -103,6 +103,7 @@ def mostrar_cartas(jugador):
         "system": respuesta_sistema,
     }
 
+
 @pony.db_session()
 def bruja_salem(jugador, partida):
     tiene_bruja = False
@@ -112,13 +113,23 @@ def bruja_salem(jugador, partida):
 
     respuesta = {"action": "", "data": ""}
     respuesta_broadcast = {"action": "", "data": ""}
-    respuesta_to = {"action": "", "data": "", "id_jugador": -1}    
+    respuesta_to = {"action": "", "data": "", "id_jugador": -1}
     respuesta_sistema = {"action": "", "data": ""}
-    if (tiene_bruja and not partida.se_jugo_bruja):
+    if tiene_bruja and not partida.se_jugo_bruja:
         partida.se_jugo_bruja = True
         carta_random_sobre = partida.sobre.random(1)[0]
-        respuesta = {"action": "error_imp", "data": {"message": f"Te toco la Bruja de Salem. La carta del sobre que se te mostro es {carta_random_sobre.nombre}"}}
-        respuesta_sistema = {"action": "mensaje_sistema", "data": {"message": f"Al jugador {jugador.apodo} le toco la Bruja de Salem y ahora sabe una carta del sobre"}}
+        respuesta = {
+            "action": "error_imp",
+            "data": {
+                "message": f"Te toco la Bruja de Salem. La carta del sobre que se te mostro es {carta_random_sobre.nombre}"
+            },
+        }
+        respuesta_sistema = {
+            "action": "mensaje_sistema",
+            "data": {
+                "message": f"Al jugador {jugador.apodo} le toco la Bruja de Salem y ahora sabe una carta del sobre"
+            },
+        }
     return {
         "personal_message": respuesta,
         "to_broadcast": respuesta_broadcast,

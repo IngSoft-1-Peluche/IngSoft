@@ -1,4 +1,5 @@
 import os
+
 if os.path.exists("database.sqlite"):
     os.remove("database.sqlite")
 
@@ -98,13 +99,17 @@ def test_unirse_a_partida():
         "/partidas/",
         json={"nombre_partida": "nombre de mi partida", "apodo": "apodo de mi jugador"},
     )
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "ultimo"})
-    
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "ultimo"},
+    )
+
     assert response.json()["id_partida"] == _response.json()["id_partida"]
     assert response.json()["nombre_partida"] == _response.json()["nombre_partida"]
     assert type(response.json()["id_jugador"]) == int
     assert response.json()["apodo"] == "ultimo"
     assert response.json()["jugador_creador"] == False
+
 
 @pony.db_session
 def test_unirse_a_partida_llena():
@@ -113,12 +118,30 @@ def test_unirse_a_partida_llena():
         "/partidas/",
         json={"nombre_partida": "partida llena", "apodo": "apodo de mi jugador"},
     )
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "segundo"})
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "tercero"})
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "cuarto"})
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "quinto"})
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "sexto"})
-    response = client.put("/partidas/", json={"id_partida": _response.json()["id_partida"], "apodo": "afuera"})
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "segundo"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "tercero"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "cuarto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "quinto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "sexto"},
+    )
+    response = client.put(
+        "/partidas/",
+        json={"id_partida": _response.json()["id_partida"], "apodo": "afuera"},
+    )
 
     assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -141,4 +164,3 @@ def test_asignar_orden():
     n = len(p1.jugadores)
     ordenes = [j.orden_turno for j in p1.jugadores]
     assert set(range(1, n + 1)) == set(ordenes)
-
