@@ -33,7 +33,8 @@ def jugador_conectado_lobby(jugador, partida):
 
 
 @pony.db_session()
-def jugador_desconectado_lobby(jugador, partida):
+def jugador_desconectado_lobby(jugador, partida, manager):
+    id_jugador = jugador.id_jugador
     if (partida.iniciada == False):
         jugador.eliminar_de_partida(partida)
         pony.commit()
@@ -43,7 +44,9 @@ def jugador_desconectado_lobby(jugador, partida):
     action1 = ""
     action2 = "jugador_desconectado_lobby"
     action3 = ""
-    action4 = "mensaje_sistema"
+    action4 = ""
+    if (manager.count_id_jugador_websockets(id_jugador) == 0):
+        action4 = "mensaje_sistema"
     data1 = ""
     data2 = {
         "jugador_desconectado": jugador.apodo,
@@ -52,7 +55,9 @@ def jugador_desconectado_lobby(jugador, partida):
         "jugadores": jugadores,
     }
     data3 = ""
-    data4 = {"message": f"El jugador {jugador.apodo} se desconecto de la partida"}
+    data4 = ""
+    if (manager.count_id_jugador_websockets(id_jugador) == 0):
+        data4 = {"message": f"El jugador {jugador.apodo} se desconecto de la partida"}
     personal_message = {"action": action1, "data": data1}
     to_broadcast = {"action": action2, "data": data2}
     message_to = {
