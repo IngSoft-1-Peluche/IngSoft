@@ -9,14 +9,49 @@ from board.board import PUERTAS, COLORES
 def test_posiciones_posibles_a_mover():
     assert posiciones_posibles_a_mover(83, 1) == [81, 83]
     assert posiciones_posibles_a_mover(69, 2) == [67, 68, 69]
-    assert posiciones_posibles_a_mover(58, 3) == [48, 55, 56, 57, 58, 59, 60, 61, 71, 72]
+    assert posiciones_posibles_a_mover(58, 3) == [
+        48,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        71,
+        72,
+    ]
+
 
 def test_posiciones_posibles_a_mover_casilla_especial():
     assert posiciones_posibles_a_mover(10, 2) == [1, 6, 8, 10, 12, 14, 71]
     assert posiciones_posibles_a_mover(54, 1) == [53, 54, 55, 65]
 
+
 def test_posiciones_posibles_a_mover_trampas():
-    assert posiciones_posibles_a_mover(22, 1) == [14, 15, 21, 22, 23, 28, 29, 30, 37, 38, 48, 49, 55, 56, 57, 62, 63, 64, 71, 73]
+    assert posiciones_posibles_a_mover(22, 1) == [
+        14,
+        15,
+        21,
+        22,
+        23,
+        28,
+        29,
+        30,
+        37,
+        38,
+        48,
+        49,
+        55,
+        56,
+        57,
+        62,
+        63,
+        64,
+        71,
+        73,
+    ]
+
 
 @pony.db_session
 def test_posiciones_iniciales():
@@ -24,7 +59,9 @@ def test_posiciones_iniciales():
     j2 = db.Jugador(apodo="maria")
     j3 = db.Jugador(apodo="pedro")
     pony.flush()
-    p1 = db.Partida(nombre="Partida para posiciones iniciales", iniciada=False, creador=j1)
+    p1 = db.Partida(
+        nombre="Partida para posiciones iniciales", iniciada=False, creador=j1
+    )
     j1.partida = p1
     j2.partida = p1
     j3.partida = p1
@@ -33,6 +70,7 @@ def test_posiciones_iniciales():
 
     for jugador in p1.jugadores:
         assert jugador.posicion in PUERTAS
+
 
 @pony.db_session
 def test_posiciones_iniciales():
@@ -95,4 +133,3 @@ def test_pasaje_de_turno_trampa():
     assert siguiente_jugador == j3
     p1.pasar_turno()
     assert p1.jugador_en_turno == j3.orden_turno
-

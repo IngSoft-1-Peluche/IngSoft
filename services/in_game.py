@@ -23,7 +23,9 @@ def pasar_turno(jugador, partida):
         data1 = ""
         data2 = ""
         data3 = ""
-        data4 = {"message": f"El jugador {jugador.apodo} termino su turno. Ahora comienza el del jugador {jugador_siguiente.apodo}."}
+        data4 = {
+            "message": f"El jugador {jugador.apodo} termino su turno. Ahora comienza el del jugador {jugador_siguiente.apodo}."
+        }
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {
@@ -32,7 +34,7 @@ def pasar_turno(jugador, partida):
             "data": data3,
         }
         system = {"action": action4, "data": data4}
-    else: 
+    else:
         action1 = "error_imp"
         data1 = {"message": "No estas en la etapa de pasar el turno"}
         personal_message = {"action": action1, "data": data1}
@@ -68,7 +70,9 @@ def tirar_dado(jugador, partida):
 
         data2 = ""
         data3 = ""
-        data4 = {"message": f"El jugador {jugador.apodo} tiro el dado y obtuvo un {dado}"}
+        data4 = {
+            "message": f"El jugador {jugador.apodo} tiro el dado y obtuvo un {dado}"
+        }
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
         message_to = {"action": action3, "data": data3, "id_jugador": -1}
@@ -121,7 +125,9 @@ def mover_jugador(jugador, nueva_posicion):
         data4 = ""
         if nueva_posicion in TRAMPAS:
             action4 = "mensaje_sistema"
-            data4 =  {"message": f"El jugador {jugador.apodo} cayo en una trampa, pierde un turno."}
+            data4 = {
+                "message": f"El jugador {jugador.apodo} cayo en una trampa, pierde un turno."
+            }
             jugador.estado_turno = "F"
         personal_message = {"action": action1, "data": data1}
         to_broadcast = {"action": action2, "data": data2}
@@ -188,7 +194,9 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data1 = ""
             data2 = ""
             data3 = ""
-            data4 = {"message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores restantes tiene alguna de esas cartas."}
+            data4 = {
+                "message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. Ninguno de los jugadores restantes tiene alguna de esas cartas."
+            }
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -208,11 +216,13 @@ def anunciar_sospecha(jugador, carta_monstruo, carta_victima):
             data1 = ""
             data2 = {
                 "nombre_sospechador": jugador.apodo,
-                "nombre_sospechoso": jugador_que_muestra.apodo, 
+                "nombre_sospechoso": jugador_que_muestra.apodo,
                 "cartas_sospechadas": [recinto, carta_monstruo, carta_victima],
             }
             data3 = {}
-            data4 = {"message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. El jugador {jugador_que_muestra.apodo} tiene que responder."}
+            data4 = {
+                "message": f"El jugador {jugador.apodo} sospecho de las siguientes cartas: {recinto}, {carta_monstruo} y {carta_victima}. El jugador {jugador_que_muestra.apodo} tiene que responder."
+            }
             personal_message = {"action": action1, "data": data1}
             to_broadcast = {"action": action2, "data": data2}
             message_to = {
@@ -321,7 +331,7 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
         respuesta_personal = {"action": "acuse", "data": ""}
         respuesta_broadcast = {"action": "acuso", "data": ""}
         respuesta_to = {"id_jugador": "", "action": "", "data": ""}
-        respuesta_sistema = {"action": "mensaje_sistema", "data": ""} 
+        respuesta_sistema = {"action": "mensaje_sistema", "data": ""}
         gano = comprobar_cartas_sobre(
             partida, [carta_monstruo, carta_victima, carta_recinto]
         )
@@ -333,7 +343,9 @@ def acusar(jugador, partida, carta_monstruo, carta_victima, carta_recinto):
                 "victima_en_sobre": carta_victima,
                 "recinto_en_sobre": carta_recinto,
             }
-            respuesta_sistema["data"] = {"message": f"El jugador {jugador.apodo} eligio las cartas {carta_recinto}, {carta_monstruo} y {carta_victima} para la acusacion y acerto todas. {jugador.apodo} gano la partida"}
+            respuesta_sistema["data"] = {
+                "message": f"El jugador {jugador.apodo} eligio las cartas {carta_recinto}, {carta_monstruo} y {carta_victima} para la acusacion y acerto todas. {jugador.apodo} gano la partida"
+            }
             jugador.ganador = True
         else:
             respuesta_pasar_turno = pasar_turno(jugador, partida)

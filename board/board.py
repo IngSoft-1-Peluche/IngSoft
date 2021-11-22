@@ -7,7 +7,7 @@ TIPOS_CASILLAS = {
     "S": "Serpiente",
     "E": "Escorpion",
     "A": "Araña",
-    "T": "Trampa"
+    "T": "Trampa",
 }
 
 TRAMPAS = [22, 29, 56, 63]
@@ -56,7 +56,7 @@ RECINTOS = {
     39: "Panteon",
     70: "Bodega",
     72: "Salon",
-    74: "Laboratorio"
+    74: "Laboratorio",
 }
 
 PUERTAS = [2, 4, 16, 35, 50, 69, 83, 84]

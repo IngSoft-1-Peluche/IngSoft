@@ -1,5 +1,5 @@
 import numpy as np
-from board import CASILLAS 
+from board import CASILLAS
 
 matriz_tablero = np.matrix(
     [
@@ -227,11 +227,11 @@ def generar_aristas_movimiento():
         aristas_movimiento.append(
             (int(matriz_tablero[j, 13]), int(matriz_tablero[j + 1, 13]))
         )
-    
-    aranias = [k for k,v in CASILLAS.items() if v == 'A']
-    escorpìones = [k for k,v in CASILLAS.items() if v == 'E']
-    serpientes = [k for k,v in CASILLAS.items() if v == 'S']
-    murcielagos = [k for k,v in CASILLAS.items() if v == 'M']
+
+    aranias = [k for k, v in CASILLAS.items() if v == "A"]
+    escorpìones = [k for k, v in CASILLAS.items() if v == "E"]
+    serpientes = [k for k, v in CASILLAS.items() if v == "S"]
+    murcielagos = [k for k, v in CASILLAS.items() if v == "M"]
     aristas_movimiento.append((aranias[0], aranias[1]))
     aristas_movimiento.append((escorpìones[0], escorpìones[1]))
     aristas_movimiento.append((serpientes[0], serpientes[1]))
@@ -257,11 +257,11 @@ matriz_adyacencia = generar_matriz_adyacencia(aristas_movimiento)
 np.savetxt("board/tablero.csv", matriz_tablero, fmt="%i", delimiter=",")
 
 mov_1 = matriz_adyacencia
-mov_2 = matriz_adyacencia ** 2 
-mov_3 = matriz_adyacencia ** 3 
-mov_4 = matriz_adyacencia ** 4 
-mov_5 = matriz_adyacencia ** 5 
-mov_6 = matriz_adyacencia ** 6 
+mov_2 = matriz_adyacencia ** 2
+mov_3 = matriz_adyacencia ** 3
+mov_4 = matriz_adyacencia ** 4
+mov_5 = matriz_adyacencia ** 5
+mov_6 = matriz_adyacencia ** 6
 
 np.savetxt("board/1mov.csv", mov_1, fmt="%i", delimiter=",")
 np.savetxt("board/2mov.csv", mov_2, fmt="%i", delimiter=",")

@@ -14,7 +14,7 @@ class ConnectionManager:
         for connection in self.active_connections:
             if connection[2] == websocket:
                 self.active_connections.remove(connection)
-    
+
     def count_id_jugador_websockets(self, id_jugador):
         ws_id_jugador = [ws for ws in self.active_connections if ws[0] == id_jugador]
         return len(ws_id_jugador)
